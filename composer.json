@@ -1,0 +1,24 @@
+{
+    "name": "jelix/composer-module-setup",
+    "type": "composer-plugin",
+    "description": "Plugin for Composer to setup modules automatically",
+    "keywords": ["composer", "composer-plugin", "jelix"],
+    "homepage": "http://jelix.org",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Laurent Jouanneau",
+            "email": "laurent@jelix.org"
+        }
+    ],
+    "require": {
+        "composer-plugin-api": "1.0.0"
+    },
+    "autoload": {
+        "psr-4": { "Jelix\\ComposerPlugin\\": "lib/" },
+    },
+    "extra": {
+        "class": "Jelix\\ComposerPlugin\\ModuleSetup"
+    },
+    "minimum-stability": "stable"
+}
