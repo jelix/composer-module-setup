@@ -15,7 +15,7 @@
         "composer-plugin-api": "1.0.0"
     },
     "autoload": {
-        "psr-4": { "Jelix\\ComposerPlugin\\": "lib/" },
+        "psr-4": { "Jelix\\ComposerPlugin\\": "lib/" }
     },
     "extra": {
         "class": "Jelix\\ComposerPlugin\\ModuleSetup"
