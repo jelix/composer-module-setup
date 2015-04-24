@@ -8,6 +8,7 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Plugin\PluginEvents;
 use Composer\Script\ScriptEvents;
+use Composer\Installer\PackageEvent;
 
 
 class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
