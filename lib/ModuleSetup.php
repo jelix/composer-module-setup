@@ -13,21 +13,31 @@ use Composer\Util\Filesystem;
 
 class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
     
+    const VERSION = 1;
     protected $composer;
     protected $io;
     protected $vendorDir;
+    protected $jsonInfosFile;
+    protected $fs;
 
-    protected $modulesDirToAdd = array();
-    protected $modulesDirToRemove = array();
-    protected $pluginsDirToAdd = array();
-    protected $pluginsDirToRemove = array();
-    protected $modules = array();
-    
+    protected $moduleInfos = array();
+
     public function activate(Composer $composer, IOInterface $io)
     {
         $this->composer = $composer;
         $this->io = $io;
         $this->vendorDir = $this->composer->getConfig()->get('vendor-dir').DIRECTORY_SEPARATOR;
+        $this->fs = new Filesystem();
+        $this->jsonInfosFile = $this->vendorDir.'jelix_modules_infos.json';
+        if (file_exists($this->jsonInfosFile)) {
+            $this->moduleInfos = json_decode(file_get_contents($this->jsonInfosFile), true);
+        }
+        else {
+            $this->moduleInfos = array(
+                 'version' => self::VERSION,
+                 'packages' => array()
+            );
+        }
     }
 
     public static function getSubscribedEvents()
@@ -36,17 +46,11 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
             ScriptEvents::POST_PACKAGE_INSTALL => array(
                 array('onPackageInstalled', 0)
             ),
-            ScriptEvents::PRE_PACKAGE_UPDATE => array(
-                array('onPackageUpdate', 0)
-            ),
             ScriptEvents::POST_PACKAGE_UPDATE => array(
                 array('onPackageUpdated', 0)
             ),
             ScriptEvents::PRE_PACKAGE_UNINSTALL => array(
                 array('onPackageUninstall', 0)
-            ),
-            ScriptEvents::POST_ROOT_PACKAGE_INSTALL => array(
-                array('onRootPackageInstalled', 0)
             ),
             ScriptEvents::POST_INSTALL_CMD => array(
                 array('onPostInstall', 0)
@@ -57,131 +61,84 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         );
     }
 
-    public function onRootPackageInstalled(PackageEvent $event)
-    {
-        $installedPackage = $event->getOperation()->getPackage();
-        $this->io->write("=== ModuleSetup === installed root package ".$installedPackage->getName()." (".$installedPackage->getType().")");
-        
-    }
-
     public function onPackageInstalled(PackageEvent $event)
     {
         $installedPackage = $event->getOperation()->getPackage();
-        $this->io->write("=== ModuleSetup === installed package ".$installedPackage->getName()." (".$installedPackage->getType().")");
+        //$this->io->write("=== ModuleSetup === installed package ".$installedPackage->getName()." (".$installedPackage->getType().")");
         if ($installedPackage->getType() !== 'jelix-module') {
             return;
         }
         $packagePath = $this->vendorDir.$installedPackage->getName();
-        $this->readModulesList($installedPackage, $packagePath);
-    }
-
-    public function onPackageUpdate(PackageEvent $event)
-    {
-        $initialPackage = $event->getOperation()->getInitialPackage();
-        $targetPackage = $event->getOperation()->getTargetPackage();
-        $this->io->write("=== ModuleSetup === update package ".$initialPackage->getName()." (".$initialPackage->getType().")");
-        if ($targetPackage->getType() !== 'jelix-module') {
-            return;
-        }
-        $packagePath = $this->vendorDir.$initialPackage->getName();
-        $this->readModulesList($initialPackage, $packagePath, false);
+        $this->readModuleInfo($installedPackage, $packagePath);
     }
 
     public function onPackageUpdated(PackageEvent $event)
     {
         $initialPackage = $event->getOperation()->getInitialPackage();
         $targetPackage = $event->getOperation()->getTargetPackage();
-        $this->io->write("=== ModuleSetup === updated package ".$targetPackage->getName()." (".$targetPackage->getType().")");
+        //$this->io->write("=== ModuleSetup === updated package ".$targetPackage->getName()." (".$targetPackage->getType().")");
         if ($targetPackage->getType() !== 'jelix-module') {
             return;
         }
         $packagePath = $this->vendorDir.$targetPackage->getName();
-        $this->readModulesList($targetPackage, $packagePath);
+        $this->readModuleInfo($targetPackage, $packagePath);
     }
 
     public function onPackageUninstall(PackageEvent $event)
     {
         $removedPackage = $event->getOperation()->getPackage();
-        $this->io->write("=== ModuleSetup === remove package ".$removedPackage->getName()." (".$removedPackage->getType().")");
+        //$this->io->write("=== ModuleSetup === remove package ".$removedPackage->getName()." (".$removedPackage->getType().")");
         if ($removedPackage->getType() !== 'jelix-module') {
             return;
         }
         $packagePath = $this->vendorDir.$removedPackage->getName();
-        $this->readModulesList($removedPackage, $packagePath, false);
+        if (isset($this->moduleInfos['packages'][$removedPackage->getName()])) {
+            unset($this->moduleInfos['packages'][$removedPackage->getName()]);
+        }
+        //$this->readModulesList($removedPackage, $packagePath, false);
     }
 
     public function onPostInstall(\Composer\Script\Event $event)
     {
-        $this->readModulesList($this->composer->getPackage(), getcwd());
-        if (file_exists($this->vendorDir.'jelix_app_path.json')) {
-            $dirs = json_decode(file_get_contents($this->vendorDir.'jelix_app_path.json'), true);
-        }
-        else {
-            $dirs = array(
-                 'modulesDir' => array(),
-                 'pluginsDir'=> array()
-            );
-        }
+        $this->readModuleInfo($this->composer->getPackage(), getcwd());
 
-        $fs = new Filesystem();
+        file_put_contents($this->jsonInfosFile, json_encode( $this->moduleInfos,JSON_PRETTY_PRINT));
 
-        foreach($this->modulesDirToAdd as $path) {
-            $path = $fs->findShortestPath($this->vendorDir, $path, true);
-            if (!in_array($path, $dirs['modulesDir'])) {
-                $dirs['modulesDir'][] = $path;
-            }
+        $allModulesDir = array();
+        $allPluginsDir = array();
+        foreach( $this->moduleInfos['packages'] as $packageName => $package) {
+            $allModulesDir = array_merge($allModulesDir, $package['modules-dir']);
+            $allPluginsDir = array_merge($allPluginsDir, $package['plugins-dir']);
         }
-
-        foreach($this->modulesDirToRemove as $path) {
-            $path = $fs->findShortestPath($this->vendorDir, $path, true);
-            $key = array_search($path, $dirs['modulesDir']);
-            if ($key !== false) {
-                unset($dirs['modulesDir'][$key]);
-            }
-        }
-
-        foreach($this->pluginsDirToAdd as $path) {
-            $path = $fs->findShortestPath($this->vendorDir, $path, true);
-            if (!in_array($path, $dirs['pluginsDir'])) {
-                $dirs['pluginsDir'][] = $path;
-            }
-        }
-
-        foreach($this->pluginsDirToRemove as $path) {
-            $path = $fs->findShortestPath($this->vendorDir, $path, true);
-            $key = array_search($path, $dirs['pluginsDir']);
-            if ($key !== false) {
-                unset($dirs['pluginsDir'][$key]);
-            }
-        }
-        file_put_contents($this->vendorDir.'jelix_app_path.json', json_encode($dirs,JSON_PRETTY_PRINT));
 
         $php = '<'.'?php'."\n";
 
-        if (count($dirs['modulesDir'])) {
+        if (count($allModulesDir)) {
             $php .= <<<EOF
 jApp::declareModulesDir(array(
 
 EOF;
-            foreach($dirs['modulesDir'] as $dir) {
+            foreach($allModulesDir as $dir) {
                 $php .= <<<EOF
             __DIR__.'/$dir',
+
 EOF;
             }
-            $php .= '));';
+            $php .= "));\n";
         }
 
-        if (count($dirs['pluginsDir'])) {
+        if (count($allPluginsDir)) {
             $php .= <<<EOF
 jApp::declarePluginsDir(array(
 
 EOF;
-            foreach($dirs['pluginsDir'] as $dir) {
+            foreach($allPluginsDir as $dir) {
                 $php .= <<<EOF
             __DIR__.'/$dir',
+
 EOF;
             }
-            $php .= '));';
+            $php .= "));\n";
         }
         file_put_contents($this->vendorDir.'jelix_app_path.php', $php);
     }
@@ -191,24 +148,30 @@ EOF;
         $this->onPostInstall($event);
     }
 
-    protected function readModulesList($package, $packagePath, $toAdd = true) {
+    protected function readModuleInfo($package, $packagePath, $toAdd = true) {
+        $this->moduleInfos['packages'][$package->getName()] = array(
+            'modules-dir' => array(),
+            'plugins-dir' => array()
+        );
+
         $extra = $package->getExtra();
-        
         if (!isset($extra['jelix'])) {
             return;
         }
+
         if (isset($extra['jelix']['modules-dir'])) {
             if (!is_array($extra['jelix']['modules-dir'])) {
                 $this->io->writeError("Error in composer.json of ".$package->getName().": extra/jelix/modules-dir is not an array");
                 return;
             }
+            $modulesDir = array();
             foreach($extra['jelix']['modules-dir'] as $path) {
-                if ($toAdd) {
-                    $this->modulesDirToAdd[] = realPath($packagePath.DIRECTORY_SEPARATOR.$path);
-                }  else {
-                    $this->modulesDirToRemove[] = realPath($packagePath.DIRECTORY_SEPARATOR.$path);
+                $path = realPath($packagePath.DIRECTORY_SEPARATOR.$path);
+                if ($path != '') {
+                    $modulesDir[] = $this->fs->findShortestPath($this->vendorDir, $path, true);
                 }
             }
+            $this->moduleInfos['packages'][$package->getName()]['modules-dir'] = $modulesDir;
         }
         if (isset($extra['jelix']['modules'])) {
             
@@ -218,13 +181,14 @@ EOF;
                 $this->io->writeError("Error in composer.json of ".$package->getName().": extra/jelix/plugins-dir is not an array");
                 return;
             }
+            $pluginsDir = array();
             foreach($extra['jelix']['plugins-dir'] as $path) {
-                if ($toAdd) {
-                    $this->pluginsDirToAdd[] = realPath($packagePath.DIRECTORY_SEPARATOR.$path);
-                } else {
-                    $this->pluginsDirToRemove[] = realPath($packagePath.DIRECTORY_SEPARATOR.$path);
+                $path = realPath($packagePath.DIRECTORY_SEPARATOR.$path);
+                if ($path != '') {
+                    $pluginsDir[] = $this->fs->findShortestPath($this->vendorDir, $path, true);
                 }
             }
+            $this->moduleInfos['packages'][$package->getName()]['plugins-dir'] = $pluginsDir;
         }
     }
 }
