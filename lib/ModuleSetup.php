@@ -111,7 +111,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         $this->readModulesList($removedPackage, $packagePath, false);
     }
 
-    public function onPostInstall(ScriptEvents $event)
+    public function onPostInstall(\Composer\Script\Event $event)
     {
         if (file_exists($this->vendorDir.'jelix_app_path.json')) {
             $dirs = json_decode(file_get_contents($this->vendorDir.'jelix_app_path.json'), true);
@@ -188,7 +188,7 @@ EOF;
         file_put_contents($this->vendorDir.'jelix_app_path.php', $php);
     }
 
-    public function onPostUpdate(ScriptEvents $event)
+    public function onPostUpdate(\Composer\Script\Event $event)
     {
         $this->onPostInstall($event);
     }
