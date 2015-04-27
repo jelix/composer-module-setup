@@ -60,15 +60,14 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
     public function onRootPackageInstalled(PackageEvent $event)
     {
         $installedPackage = $event->getOperation()->getPackage();
-        $this->io->write("installed root package ".$installedPackage->getName()." (".$installedPackage->getType().")");
-        $this->readModulesList($installedPackage, getcwd());
+        $this->io->write("=== ModuleSetup === installed root package ".$installedPackage->getName()." (".$installedPackage->getType().")");
         
     }
 
     public function onPackageInstalled(PackageEvent $event)
     {
         $installedPackage = $event->getOperation()->getPackage();
-        $this->io->write("installed package ".$installedPackage->getName()." (".$installedPackage->getType().")");
+        $this->io->write("=== ModuleSetup === installed package ".$installedPackage->getName()." (".$installedPackage->getType().")");
         if ($installedPackage->getType() !== 'jelix-module') {
             return;
         }
@@ -80,7 +79,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
     {
         $initialPackage = $event->getOperation()->getInitialPackage();
         $targetPackage = $event->getOperation()->getTargetPackage();
-        $this->io->write("update package ".$initialPackage->getName()." (".$initialPackage->getType().")");
+        $this->io->write("=== ModuleSetup === update package ".$initialPackage->getName()." (".$initialPackage->getType().")");
         if ($targetPackage->getType() !== 'jelix-module') {
             return;
         }
@@ -92,7 +91,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
     {
         $initialPackage = $event->getOperation()->getInitialPackage();
         $targetPackage = $event->getOperation()->getTargetPackage();
-        $this->io->write("updated package ".$targetPackage->getName()." (".$targetPackage->getType().")");
+        $this->io->write("=== ModuleSetup === updated package ".$targetPackage->getName()." (".$targetPackage->getType().")");
         if ($targetPackage->getType() !== 'jelix-module') {
             return;
         }
@@ -103,7 +102,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
     public function onPackageUninstall(PackageEvent $event)
     {
         $removedPackage = $event->getOperation()->getPackage();
-        $this->io->write("remove package ".$removedPackage->getName()." (".$removedPackage->getType().")");
+        $this->io->write("=== ModuleSetup === remove package ".$removedPackage->getName()." (".$removedPackage->getType().")");
         if ($removedPackage->getType() !== 'jelix-module') {
             return;
         }
@@ -113,6 +112,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
 
     public function onPostInstall(\Composer\Script\Event $event)
     {
+        $this->readModulesList($this->composer->getPackage(), getcwd());
         if (file_exists($this->vendorDir.'jelix_app_path.json')) {
             $dirs = json_decode(file_get_contents($this->vendorDir.'jelix_app_path.json'), true);
         }
@@ -154,12 +154,12 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
                 unset($dirs['pluginsDir'][$key]);
             }
         }
-        file_put_contents($this->vendorDir.'jelix_app_path.json', json_encode($dirs));
+        file_put_contents($this->vendorDir.'jelix_app_path.json', json_encode($dirs,JSON_PRETTY_PRINT));
 
         $php = '<'.'?php'."\n";
 
         if (count($dirs['modulesDir'])) {
-            $php = <<<EOF
+            $php .= <<<EOF
 jApp::declareModulesDir(array(
 
 EOF;
@@ -172,9 +172,7 @@ EOF;
         }
 
         if (count($dirs['pluginsDir'])) {
-            $php = <<<EOF
-<?php
-
+            $php .= <<<EOF
 jApp::declarePluginsDir(array(
 
 EOF;
