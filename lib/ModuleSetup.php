@@ -65,7 +65,8 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
     {
         $installedPackage = $event->getOperation()->getPackage();
         //$this->io->write("=== ModuleSetup === installed package ".$installedPackage->getName()." (".$installedPackage->getType().")");
-        if ($installedPackage->getType() !== 'jelix-module') {
+        if ($installedPackage->getType() !== 'jelix-module' ||
+            $installedPackage->getName() !== 'jelix/jelix') {
             return;
         }
         $packagePath = $this->vendorDir.$installedPackage->getName();
@@ -77,7 +78,8 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         $initialPackage = $event->getOperation()->getInitialPackage();
         $targetPackage = $event->getOperation()->getTargetPackage();
         //$this->io->write("=== ModuleSetup === updated package ".$targetPackage->getName()." (".$targetPackage->getType().")");
-        if ($targetPackage->getType() !== 'jelix-module') {
+        if ($targetPackage->getType() !== 'jelix-module' ||
+            $targetPackage->getName() !== 'jelix/jelix') {
             return;
         }
         $packagePath = $this->vendorDir.$targetPackage->getName();
@@ -88,7 +90,8 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
     {
         $removedPackage = $event->getOperation()->getPackage();
         //$this->io->write("=== ModuleSetup === remove package ".$removedPackage->getName()." (".$removedPackage->getType().")");
-        if ($removedPackage->getType() !== 'jelix-module') {
+        if ($removedPackage->getType() !== 'jelix-module' ||
+            $removedPackage->getName() !== 'jelix/jelix') {
             return;
         }
         $packagePath = $this->vendorDir.$removedPackage->getName();
