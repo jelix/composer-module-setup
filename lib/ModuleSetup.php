@@ -109,9 +109,11 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
 
         $allModulesDir = array();
         $allPluginsDir = array();
+        $allModules = array();
         foreach( $this->moduleInfos['packages'] as $packageName => $package) {
             $allModulesDir = array_merge($allModulesDir, $package['modules-dir']);
             $allPluginsDir = array_merge($allPluginsDir, $package['plugins-dir']);
+            $allModules = array_merge($allModules, $package['modules']);
         }
 
         $php = '<'.'?php'."\n";
@@ -122,6 +124,20 @@ jApp::declareModulesDir(array(
 
 EOF;
             foreach($allModulesDir as $dir) {
+                $php .= <<<EOF
+            __DIR__.'/$dir',
+
+EOF;
+            }
+            $php .= "));\n";
+        }
+
+        if (count($allModules)) {
+            $php .= <<<EOF
+jApp::declareModule(array(
+
+EOF;
+            foreach($allModules as $dir) {
                 $php .= <<<EOF
             __DIR__.'/$dir',
 
@@ -154,7 +170,8 @@ EOF;
     protected function readModuleInfo($package, $packagePath, $toAdd = true) {
         $this->moduleInfos['packages'][$package->getName()] = array(
             'modules-dir' => array(),
-            'plugins-dir' => array()
+            'plugins-dir' => array(),
+            'modules' => array(),
         );
 
         $extra = $package->getExtra();
@@ -177,7 +194,18 @@ EOF;
             $this->moduleInfos['packages'][$package->getName()]['modules-dir'] = $modulesDir;
         }
         if (isset($extra['jelix']['modules'])) {
-            
+            if (!is_array($extra['jelix']['modules'])) {
+                $this->io->writeError("Error in composer.json of ".$package->getName().": extra/jelix/modules is not an array");
+                return;
+            }
+            $modules = array();
+            foreach($extra['jelix']['modules'] as $path) {
+                $path = realPath($packagePath.DIRECTORY_SEPARATOR.$path);
+                if ($path != '') {
+                    $modules[] = $this->fs->findShortestPath($this->vendorDir, $path, true);
+                }
+            }
+            $this->moduleInfos['packages'][$package->getName()]['modules'] = $modules;
         }
         if (isset($extra['jelix']['plugins-dir'])) {
             if (!is_array($extra['jelix']['plugins-dir'])) {
