@@ -9,7 +9,7 @@ In the composer.json of your application, declare the plugin
 ```json
 {
     "require": {
-        "jelix/composer-module-setup": "0.2"
+        "jelix/composer-module-setup": "0.3.*"
     }
 }
 ```
@@ -42,7 +42,7 @@ the composer.json:
 ```json
 {
     "require": {
-        "jelix/composer-module-setup": "0.2"
+        "jelix/composer-module-setup": "0.3.*"
     },
     "extra": {
         "jelix": {
