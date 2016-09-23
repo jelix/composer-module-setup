@@ -16,6 +16,9 @@ class SetupJelix16 {
 
     function setup() {
         $appDir = $this->parameters->getAppDir();
+        if (!$appDir) {
+            throw new \Exception("No application directory is set in JelixParameters");
+        }
         $vendorDir = $this->parameters->getVendorDir();
         $fs = new Filesystem();
         $localinifile= $appDir.'/var/config/localconfig.ini.php';

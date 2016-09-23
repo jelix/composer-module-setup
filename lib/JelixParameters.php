@@ -74,6 +74,9 @@ class JelixParameters {
 
         $extra = $package->getExtra();
         if (!isset($extra['jelix'])) {
+            if ($appPackage) {
+                $this->appDir = $packagePath;
+            }
             return;
         }
 
@@ -83,6 +86,9 @@ class JelixParameters {
             }
             else {
                 $this->appDir = $packagePath;
+            }
+            if (!$this->appDir) {
+                throw new ReaderException("application dir is not set");
             }
         }
 

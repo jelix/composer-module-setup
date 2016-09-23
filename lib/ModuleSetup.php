@@ -101,6 +101,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
 
     public function onPackageUninstall(PackageEvent $event)
     {
+        // note to myself: the package files are still there at this step
         $removedPackage = $event->getOperation()->getPackage();
         if ($removedPackage->getType() !== 'jelix-module' &&
             $removedPackage->getName() !== 'jelix/jelix' &&
