@@ -6,7 +6,7 @@ For Jelix 1.6.9 and higher.
 
 Author who provide their modules via Composer, should declare directories 
 containing modules or plugins. It will avoid the developer to declare them 
-into his application.init.php (Jelix 1.7) or in the configuration (Jelix 1.6).
+into his application.init.php (Jelix 1.7) or in the configuration (Jelix 1.6.9+).
 
 ## installation
 
@@ -15,7 +15,7 @@ In the composer.json of your application, declare the plugin
 ```json
 {
     "require": {
-        "jelix/composer-module-setup": "^0.3.0"
+        "jelix/composer-module-setup": "^0.4.0"
     }
 }
 ```
@@ -76,7 +76,7 @@ the composer.json of the application:
 ```json
 {
     "require": {
-        "lzmcloud/composer-plugin": "0.1.*"
+        "jelix/composer-module-setup": "^0.3.0"
     },
     "extra": {
         "jelix": {
@@ -96,7 +96,7 @@ the composer.json of the application:
 
 ## In Jelix 1.7 and higher
 
-In youre application.init.php, you should include the jelix_app_path.php:
+In your application.init.php, you should include the jelix_app_path.php:
 
 ```php
 <?php
@@ -120,8 +120,35 @@ require (__DIR__.'/vendor/jelix_app_path.php');
 Remember: in Jelix 1.7 and higher, declaring modules and plugins in the modulesPath/pluginsPath
 parameter in the configuration file is not supported anymore.
 
-## In Jelix 1.6.9
+## In Jelix 1.6.x equal or higher than 1.6.9
 
 The composer plugin declares automatically modules and plugins directory into 
 the localconfig.ini.php file, in `modulesPath` and `pluginsPath` properties, 
 and also in the `modules` section.
+
+However, at the application level, the composer.json should also content the path
+to the application directory (the directory containing the project.xml etc), and
+the path to the var/config directory, if the directory containing the composer.json
+file is not the application directory and/or if the var/config is not in the
+application directory. You must set these path into `app-dir` and `var-config-dir`
+(may be related to the composer.json directory)
+
+
+```json
+{
+    "require": {
+        "jelix/composer-module-setup": "^0.3.0"
+    },
+    "extra": {
+        "jelix": {
+            "app-dir" : "myapp/",
+            "var-config-dir" : "/var/lib/myapp/config/",
+            "modules-dir" : []
+        }
+    }
+}
+```
+
+
+
+

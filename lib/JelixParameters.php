@@ -11,7 +11,15 @@ class JelixParameters {
 
     protected $fs;
 
+    /**
+     * @var string
+     */
     protected $vendorDir;
+
+    /**
+     * @var string
+     */
+    protected $varConfigDir;
 
     /**
      * @var string
@@ -60,6 +68,10 @@ class JelixParameters {
         return $this->appDir;
     }
 
+    function getVarConfigDir() {
+        return $this->varConfigDir;
+    }
+
     function getVendorDir() {
         return $this->vendorDir;
     }
@@ -82,14 +94,36 @@ class JelixParameters {
 
         if ($appPackage) {
             if (isset($extra['jelix']['app-dir'])) {
-                $this->appDir = realPath($packagePath.DIRECTORY_SEPARATOR.$extra['jelix']['app-dir']);
+                if ($fs->isAbsolutePath($extra['jelix']['app-dir'])) {
+                    $this->appDir = $extra['jelix']['app-dir'];
+                }
+                else {
+                    $this->appDir = realPath($packagePath.DIRECTORY_SEPARATOR.$extra['jelix']['app-dir']);
+                }
+                if (!$this->appDir || !file_exists($this->appDir)) {
+                    throw new ReaderException("given application dir is not set or does not exists");
+                }
             }
             else {
                 $this->appDir = $packagePath;
             }
-            if (!$this->appDir) {
-                throw new ReaderException("application dir is not set");
+            $this->appDir = rtrim($this->appDir, "/")."/";
+
+            if (isset($extra['jelix']['var-config-dir'])) {
+                if ($fs->isAbsolutePath($extra['jelix']['var-config-dir'])) {
+                    $this->varConfigDir = $extra['jelix']['var-config-dir'];
+                }
+                else {
+                    $this->varConfigDir = realPath($packagePath . DIRECTORY_SEPARATOR . $extra['jelix']['var-config-dir']);
+                }
+                if (!$this->varConfigDir || !file_exists($this->varConfigDir)) {
+                    throw new ReaderException("given var config dir is not set or does not exists");
+                }
             }
+            else {
+                $this->varConfigDir = $packagePath.'/var/config';
+            }
+            $this->varConfigDir = rtrim($this->varConfigDir, "/")."/";
         }
 
         if (isset($extra['jelix']['modules-dir'])) {
