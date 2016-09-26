@@ -35,7 +35,12 @@ class SetupJelix16 {
         if (count($allModulesDir)) {
             $modulesPath = '';
             foreach($allModulesDir as $path) {
-                $modulesPath .= ',app:'.$fs->findShortestPath($appDir, $vendorDir.$path, true);
+                $path = $fs->findShortestPath($appDir, $vendorDir.$path, true);
+                if ($fs->isAbsolutePath($path)) {
+                    $modulesPath .= ','.$path;
+                } else {
+                    $modulesPath .= ',app:'.$path;
+                }
             }
             $modulesPath = trim($modulesPath, ',');
             $ini->setValue('modulesPath', $modulesPath);
@@ -45,7 +50,12 @@ class SetupJelix16 {
         if (count($allPluginsDir)) {
             $pluginsPath = '';
             foreach($allPluginsDir as $path) {
-                $pluginsPath .= ',app:'.$fs->findShortestPath($appDir, $vendorDir.$path, true);
+                $path = $fs->findShortestPath($appDir, $vendorDir.$path, true);
+                if ($fs->isAbsolutePath($path)) {
+                    $pluginsPath .= ','.$path;
+                } else {
+                    $pluginsPath .= ',app:'.$path;
+                }
             }
             $pluginsPath = trim($pluginsPath, ',');
             $ini->setValue('pluginsPath', $pluginsPath);
@@ -62,7 +72,13 @@ class SetupJelix16 {
             foreach($allModules as $path) {
                 $path = $fs->normalizePath($path);
                 $moduleName = basename($path);
-                $ini->setValue($moduleName.'.path', 'app:'.$fs->findShortestPath($appDir, $vendorDir.$path, true), 'modules');
+
+                $path = $fs->findShortestPath($appDir, $vendorDir.$path, true);
+                if (!$fs->isAbsolutePath($path)) {
+                    $path = 'app:'.$path;
+                }
+
+                $ini->setValue($moduleName.'.path', $path, 'modules');
             }
         }
         $ini->save();
