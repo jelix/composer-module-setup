@@ -94,7 +94,7 @@ class JelixParameters {
 
         if ($appPackage) {
             if (isset($extra['jelix']['app-dir'])) {
-                if ($fs->isAbsolutePath($extra['jelix']['app-dir'])) {
+                if ($this->fs->isAbsolutePath($extra['jelix']['app-dir'])) {
                     $this->appDir = $extra['jelix']['app-dir'];
                 }
                 else {
@@ -111,7 +111,7 @@ class JelixParameters {
             $this->varConfigDir = $this->appDir.'var/config';
 
             if (isset($extra['jelix']['var-config-dir'])) {
-                if ($fs->isAbsolutePath($extra['jelix']['var-config-dir'])) {
+                if ($this->fs->isAbsolutePath($extra['jelix']['var-config-dir'])) {
                     $this->varConfigDir = $extra['jelix']['var-config-dir'];
                 }
                 else {
