@@ -108,6 +108,7 @@ class JelixParameters {
                 $this->appDir = $packagePath;
             }
             $this->appDir = rtrim($this->appDir, "/")."/";
+            $this->varConfigDir = $this->appDir.'var/config';
 
             if (isset($extra['jelix']['var-config-dir'])) {
                 if ($fs->isAbsolutePath($extra['jelix']['var-config-dir'])) {
@@ -119,11 +120,8 @@ class JelixParameters {
                 if (!$this->varConfigDir || !file_exists($this->varConfigDir)) {
                     throw new ReaderException("given var config dir is not set or does not exists");
                 }
+                $this->varConfigDir = rtrim($this->varConfigDir, "/")."/";
             }
-            else {
-                $this->varConfigDir = $packagePath.'/var/config';
-            }
-            $this->varConfigDir = rtrim($this->varConfigDir, "/")."/";
         }
 
         if (isset($extra['jelix']['modules-dir'])) {
