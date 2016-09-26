@@ -15,6 +15,15 @@ class SetupJelix16 {
     }
 
     function setup() {
+        $allModulesDir = $this->parameters->getAllModulesDirs();
+        $allPluginsDir = $this->parameters->getAllPluginsDirs();
+        $allModules = $this->parameters->getAllSingleModuleDirs();
+
+        if (!count($allModulesDir) && !count($allModules) && !count($allPluginsDir)) {
+            // nothing to setup
+            return;
+        }
+
         $appDir = $this->parameters->getAppDir();
         if (!$appDir) {
             throw new \Exception("No application directory is set in JelixParameters");
@@ -22,16 +31,18 @@ class SetupJelix16 {
         $configDir = $this->parameters->getVarConfigDir();
         $vendorDir = $this->parameters->getVendorDir();
         $fs = new Filesystem();
+
+        // open the localconfig.ini.php file
         $localinifile= $configDir.'localconfig.ini.php';
         if (!file_exists($localinifile)) {
             if (!file_exists($configDir)) {
-                throw new \Exception("Configuration directory ".$configDir.' for the app does not exist');
+                throw new \Exception('Configuration directory "'.$configDir.'" for the app does not exist');
             }
             file_put_contents($localinifile, "<"."?php\n;die(''); ?".">\n\n");
         }
         $ini = new IniModifier($localinifile);
 
-        $allModulesDir = $this->parameters->getAllModulesDirs();
+
         if (count($allModulesDir)) {
             $modulesPath = '';
             foreach($allModulesDir as $path) {
@@ -46,7 +57,7 @@ class SetupJelix16 {
             $ini->setValue('modulesPath', $modulesPath);
         }
 
-        $allPluginsDir = $this->parameters->getAllPluginsDirs();
+
         if (count($allPluginsDir)) {
             $pluginsPath = '';
             foreach($allPluginsDir as $path) {
@@ -61,7 +72,7 @@ class SetupJelix16 {
             $ini->setValue('pluginsPath', $pluginsPath);
         }
 
-        $allModules = $this->parameters->getAllSingleModuleDirs();
+
         if (count($allModules)) {
             // erase first all "<module>.path" keys
             foreach($ini->getValues('modules') as $key => $val) {
