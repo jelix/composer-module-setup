@@ -68,7 +68,9 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         //$this->io->write("=== ModuleSetup === installed package ".$installedPackage->getName()." (".$installedPackage->getType().")");
         if ($installedPackage->getType() !== 'jelix-module' &&
             $installedPackage->getName() !== 'jelix/jelix' &&
-            $installedPackage->getName() !== 'jelix/for-classic-package') {
+            $installedPackage->getName() !== 'jelix/jelix-essential' &&
+            $installedPackage->getName() !== 'jelix/for-classic-package' // deprecated
+        ) {
             return;
         }
         $packagePath = $this->vendorDir.$installedPackage->getName();
@@ -87,7 +89,9 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         //$this->io->write("=== ModuleSetup === updated package ".$targetPackage->getName()." (".$targetPackage->getType().")");
         if ($targetPackage->getType() !== 'jelix-module' &&
             $targetPackage->getName() !== 'jelix/jelix' &&
-            $targetPackage->getName() !== 'jelix/for-classic-package') {
+            $targetPackage->getName() !== 'jelix/jelix-essential' &&
+            $targetPackage->getName() !== 'jelix/for-classic-package' // deprecated
+        ) {
             return;
         }
         $packagePath = $this->vendorDir.$targetPackage->getName();
@@ -105,7 +109,9 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         $removedPackage = $event->getOperation()->getPackage();
         if ($removedPackage->getType() !== 'jelix-module' &&
             $removedPackage->getName() !== 'jelix/jelix' &&
-            $removedPackage->getName() !== 'jelix/for-classic-package') {
+            $removedPackage->getName() !== 'jelix/jelix-essential' &&
+            $removedPackage->getName() !== 'jelix/for-classic-package' // deprecated
+        ) {
             return;
         }
         $this->jelixParameters->removePackage($removedPackage->getName());
@@ -122,7 +128,9 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         $this->jelixParameters->saveToFile($this->jsonInfosFile);
 
         if ($this->jelixParameters->getPackageParameters('jelix/jelix') ||
-            $this->jelixParameters->getPackageParameters('jelix/for-classic-package')) {
+            $this->jelixParameters->getPackageParameters('jelix/jelix-essential') ||
+            $this->jelixParameters->getPackageParameters('jelix/for-classic-package')  // deprecated
+        ) {
             $setup = new SetupJelix17($this->jelixParameters);
             $setup->setup();
         } else {

@@ -29,7 +29,7 @@ class JelixParameters {
     function __construct($vendorDir)
     {
         $this->fs = new Filesystem();
-        $this->vendorDir = $vendorDir;
+        $this->vendorDir = rtrim($vendorDir, '/').'/';
     }
 
     function loadFromFile($filepath)
@@ -78,6 +78,9 @@ class JelixParameters {
 
     /**
      * @param PackageInterface $package
+     * @param bool $appPackage indicate if the package is a package loaded by composer (false)
+     *             or if it is the application itself (true)
+     *
      */
     function addPackage(PackageInterface $package, $packagePath, $appPackage=false)
     {
@@ -108,7 +111,7 @@ class JelixParameters {
                 $this->appDir = $packagePath;
             }
             $this->appDir = rtrim($this->appDir, "/")."/";
-            $this->varConfigDir = $this->appDir.'var/config';
+            $this->varConfigDir = $this->appDir.'var/config/';
 
             if (isset($extra['jelix']['var-config-dir'])) {
                 if ($this->fs->isAbsolutePath($extra['jelix']['var-config-dir'])) {
