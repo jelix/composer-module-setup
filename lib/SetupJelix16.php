@@ -10,8 +10,14 @@ class SetupJelix16 {
      */
     protected $parameters;
 
+    /**
+     * @var Filesystem
+     */
+    protected $fs;
+
     function __construct(JelixParameters $parameters) {
         $this->parameters = $parameters;
+        $this->fs = new Filesystem();
     }
 
     function setup() {
@@ -19,18 +25,11 @@ class SetupJelix16 {
         $allPluginsDir = $this->parameters->getAllPluginsDirs();
         $allModules = $this->parameters->getAllSingleModuleDirs();
 
-        if (!count($allModulesDir) && !count($allModules) && !count($allPluginsDir)) {
-            // nothing to setup
-            return;
-        }
-
         $appDir = $this->parameters->getAppDir();
         if (!$appDir) {
             throw new \Exception("No application directory is set in JelixParameters");
         }
         $configDir = $this->parameters->getVarConfigDir();
-        $vendorDir = $this->parameters->getVendorDir();
-        $fs = new Filesystem();
 
         // open the localconfig.ini.php file
         $localinifile= $configDir.'localconfig.ini.php';
@@ -43,55 +42,104 @@ class SetupJelix16 {
         $ini = new IniModifier($localinifile);
 
 
+        $vendorPath = $this->getFinalPath('./');
+
+        // retrieve the current modulesPath value
+        $modulesPath = $this->getCurrentModulesPath($configDir, $ini, $vendorPath);
         if (count($allModulesDir)) {
-            $modulesPath = '';
+            // add all declared modules directories
             foreach($allModulesDir as $path) {
-                $path = $fs->findShortestPath($appDir, $vendorDir.$path, true);
-                if ($fs->isAbsolutePath($path)) {
-                    $modulesPath .= ','.$path;
-                } else {
-                    $modulesPath .= ',app:'.$path;
-                }
+                $modulesPath[] = $this->getFinalPath($path);
             }
-            $modulesPath = trim($modulesPath, ',');
-            $ini->setValue('modulesPath', $modulesPath);
         }
+        $ini->setValue('modulesPath', implode(',', array_unique($modulesPath)));
 
-
+        // retrieve the current pluginsPath value
+        $pluginsPath = $this->getCurrentPluginsPath($configDir, $ini, $vendorPath);
         if (count($allPluginsDir)) {
-            $pluginsPath = '';
+            // add all declared plugins directories
             foreach($allPluginsDir as $path) {
-                $path = $fs->findShortestPath($appDir, $vendorDir.$path, true);
-                if ($fs->isAbsolutePath($path)) {
-                    $pluginsPath .= ','.$path;
-                } else {
-                    $pluginsPath .= ',app:'.$path;
-                }
+                $pluginsPath[] = $this->getFinalPath($path);
             }
-            $pluginsPath = trim($pluginsPath, ',');
-            $ini->setValue('pluginsPath', $pluginsPath);
         }
+        $ini->setValue('pluginsPath', implode(',', array_unique($pluginsPath)));
 
-
-        if (count($allModules)) {
-            // erase first all "<module>.path" keys
-            foreach($ini->getValues('modules') as $key => $val) {
-                if (preg_match("/\\.path$/", $key)) {
-                    $ini->removeValue($key, "modules");
-                }
+        // erase first all "<module>.path" keys of modules that are inside a package
+        foreach($ini->getValues('modules') as $key => $val) {
+            if (preg_match("/\\.path$/", $key) && strpos($val, $vendorPath) === 0) {
+                $ini->removeValue($key, "modules");
             }
+        }
+        if (count($allModules)) {
+            // declare path of single modules
             foreach($allModules as $path) {
-                $path = $fs->normalizePath($path);
+                $path = $this->fs->normalizePath($path);
                 $moduleName = basename($path);
 
-                $path = $fs->findShortestPath($appDir, $vendorDir.$path, true);
-                if (!$fs->isAbsolutePath($path)) {
-                    $path = 'app:'.$path;
-                }
+                $path = $this->getFinalPath($path);
 
                 $ini->setValue($moduleName.'.path', $path, 'modules');
             }
         }
         $ini->save();
+    }
+
+    protected function getCurrentModulesPath($configDir, $localIni, $vendorPath) {
+
+        $modulesPath = $localIni->getValue('modulesPath');
+        if ($modulesPath == '') {
+            $mainConfigIni = new IniModifier($configDir.'mainconfig.ini.php');
+            $modulesPath = $mainConfigIni->getValue('modulesPath');
+            if ($modulesPath == '') {
+                $modulesPath = 'lib:jelix-modules/,app:modules/';
+            }
+        }
+        $pathList = preg_split('/ *, */', $modulesPath);
+        return $this->removeVendorPath($pathList, $vendorPath);
+    }
+
+    protected function getCurrentPluginsPath($configDir, $localIni, $vendorPath) {
+
+        $pluginsPath = $localIni->getValue('pluginsPath');
+        if ($pluginsPath == '') {
+            $mainConfigIni = new IniModifier($configDir.'mainconfig.ini.php');
+            $pluginsPath = $mainConfigIni->getValue('pluginsPath');
+            if ($pluginsPath == '') {
+                $pluginsPath = 'app:plugins/';
+            }
+        }
+        $pathList = preg_split('/ *, */', $pluginsPath);
+        return $this->removeVendorPath($pathList, $vendorPath);
+    }
+
+    /**
+     * Remove all path that are into the vendor directory, to be sure there will
+     * not have anymore path from packages that are not existing anymore.
+     *
+     * @param string[] $pathList
+     */
+    protected function removeVendorPath($pathList, $vendorPath) {
+        $list = [];
+
+        foreach ($pathList as $path) {
+            if (strpos($path, $vendorPath) !== 0) {
+                $list[] = rtrim($path, '/');
+            }
+        }
+        return $list;
+    }
+
+
+    protected function getFinalPath($path) {
+        $appDir = $this->parameters->getAppDir();
+        $vendorDir = $this->parameters->getVendorDir();
+        $path = $this->fs->findShortestPath($appDir, $vendorDir.$path, true);
+        if ($this->fs->isAbsolutePath($path)) {
+            return $path;
+        }
+        if (substr($path, 0,2) == './') {
+            $path = substr($path, 2);
+        }
+        return 'app:'.$path;
     }
 }
