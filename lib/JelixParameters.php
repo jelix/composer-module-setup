@@ -104,13 +104,21 @@ class JelixParameters {
                     $this->appDir = realPath($packagePath.DIRECTORY_SEPARATOR.$extra['jelix']['app-dir']);
                 }
                 if (!$this->appDir || !file_exists($this->appDir)) {
-                    throw new ReaderException("given application dir is not set or does not exists");
+                    throw new ReaderException("Error in composer.json of ".$package->getName().": extra/jelix/app-dir is not set or does not contain a valid path");
                 }
+                if (!file_exists($this->appDir.'project.xml')) {
+                    throw new ReaderException("Error in composer.json of ".$package->getName().": extra/jelix/app-dir is not a path to a Jelix application");
+                }
+
             }
             else {
                 $this->appDir = $packagePath;
+                if (!file_exists($this->appDir.'project.xml')) {
+                    throw new ReaderException("the directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/app-dir parameter");
+                }
             }
             $this->appDir = rtrim($this->appDir, "/")."/";
+
             $this->varConfigDir = $this->appDir.'var/config/';
 
             if (isset($extra['jelix']['var-config-dir'])) {
@@ -121,9 +129,12 @@ class JelixParameters {
                     $this->varConfigDir = realPath($packagePath . DIRECTORY_SEPARATOR . $extra['jelix']['var-config-dir']);
                 }
                 if (!$this->varConfigDir || !file_exists($this->varConfigDir)) {
-                    throw new ReaderException("given var config dir is not set or does not exists");
+                    throw new ReaderException("Error in composer.json of ".$package->getName().": extra/jelix/var-config-dir is not set or does not contain a valid path");
                 }
                 $this->varConfigDir = rtrim($this->varConfigDir, "/")."/";
+            }
+            else if (!file_exists($this->varConfigDir)) {
+                throw new ReaderException("the var/config directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/var-config-dir parameter");
             }
         }
 
