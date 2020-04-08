@@ -31,15 +31,19 @@ class SetupJelix16 {
         }
         $configDir = $this->parameters->getVarConfigDir();
 
-        // open the localconfig.ini.php file
-        $localinifile= $configDir.'localconfig.ini.php';
-        if (!file_exists($localinifile)) {
+        // open the configuration file
+        $iniFileName = $this->parameters->getConfigFileName();
+        if (!$iniFileName) {
+            $iniFileName = 'localconfig.ini.php';
+        }
+        $iniFileName= $configDir.$iniFileName;
+        if (!file_exists($iniFileName)) {
             if (!file_exists($configDir)) {
                 throw new \Exception('Configuration directory "'.$configDir.'" for the app does not exist');
             }
-            file_put_contents($localinifile, "<"."?php\n;die(''); ?".">\n\n");
+            file_put_contents($iniFileName, "<"."?php\n;die(''); ?".">\n\n");
         }
-        $ini = new IniModifier($localinifile);
+        $ini = new IniModifier($iniFileName);
 
 
         $vendorPath = $this->getFinalPath('./');

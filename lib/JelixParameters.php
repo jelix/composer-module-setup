@@ -26,6 +26,14 @@ class JelixParameters {
      */
     protected $appDir = null;
 
+
+    /**
+     * name of the configuration file taht will be modified to declare
+     * module paths. Only for Jelix 1.6
+     * @var string $configurationFileName
+     */
+    protected $configurationFileName = '';
+
     function __construct($vendorDir)
     {
         $this->fs = new Filesystem();
@@ -72,6 +80,10 @@ class JelixParameters {
         return $this->varConfigDir;
     }
 
+    function getConfigFileName() {
+        return $this->configurationFileName;
+    }
+
     function getVendorDir() {
         return $this->vendorDir;
     }
@@ -96,6 +108,7 @@ class JelixParameters {
         }
 
         if ($appPackage) {
+
             if (isset($extra['jelix']['app-dir'])) {
                 if ($this->fs->isAbsolutePath($extra['jelix']['app-dir'])) {
                     $this->appDir = $extra['jelix']['app-dir'];
@@ -135,6 +148,13 @@ class JelixParameters {
             }
             else if (!file_exists($this->varConfigDir)) {
                 throw new ReaderException("the var/config directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/var-config-dir parameter");
+            }
+
+            if (isset($extra['jelix']['config-file-16'])) {
+                $this->configurationFileName = $extra['jelix']['config-file-16'];
+                if ($this->configurationFileName && !file_exists($this->varConfigDir.$this->configurationFileName)) {
+                    throw new ReaderException("the configuration file name indicated into extra/jelix/config-file-16 does not exists into the var/config/ directory of the application");
+                }
             }
         }
 
