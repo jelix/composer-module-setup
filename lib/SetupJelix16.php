@@ -56,7 +56,10 @@ class SetupJelix16 {
                 $modulesPath[] = $this->getFinalPath($path);
             }
         }
-        $ini->setValue('modulesPath', implode(',', array_unique($modulesPath)));
+        $modulesPath =  implode(',', array_unique($modulesPath));
+        if ($ini->getValue('modulesPath') != $modulesPath) {
+            $ini->setValue('modulesPath', $modulesPath);
+        }
 
         // retrieve the current pluginsPath value
         $pluginsPath = $this->getCurrentPluginsPath($configDir, $ini, $vendorPath);
@@ -66,14 +69,19 @@ class SetupJelix16 {
                 $pluginsPath[] = $this->getFinalPath($path);
             }
         }
-        $ini->setValue('pluginsPath', implode(',', array_unique($pluginsPath)));
+        $pluginsPath = implode(',', array_unique($pluginsPath));
+        if ($ini->getValue('pluginsPath') != $pluginsPath) {
+            $ini->setValue('pluginsPath', $pluginsPath);
+        }
 
-        // erase first all "<module>.path" keys of modules that are inside a package
+
+        $modulePathToRemove = array();
         foreach($ini->getValues('modules') as $key => $val) {
             if (preg_match("/\\.path$/", $key) && strpos($val, $vendorPath) === 0) {
-                $ini->removeValue($key, "modules");
+                $modulePathToRemove[$key] = $val;
             }
         }
+
         if (count($allModules)) {
             // declare path of single modules
             foreach($allModules as $path) {
@@ -82,9 +90,21 @@ class SetupJelix16 {
 
                 $path = $this->getFinalPath($path);
 
-                $ini->setValue($moduleName.'.path', $path, 'modules');
+                if ($ini->getValue($moduleName.'.path', 'modules') != $path) {
+                    $ini->setValue($moduleName.'.path', $path, 'modules');
+                }
+
+                if (isset($modulePathToRemove[$moduleName.'.path'])) {
+                    unset($modulePathToRemove[$moduleName.'.path']);
+                }
             }
         }
+
+        // erase all "<module>.path" keys of modules that are not inside a package anymore
+        foreach ($modulePathToRemove as $key => $path) {
+            $ini->removeValue($key, 'modules');
+        }
+
         $ini->save();
     }
 
