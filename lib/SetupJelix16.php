@@ -32,7 +32,16 @@ class SetupJelix16 {
         $configDir = $this->parameters->getVarConfigDir();
 
         // open the configuration file
-        $iniFileName = $this->parameters->getConfigFileName();
+        // during upgrade of composer-module-setup, it seems Composer load some classes
+        // of the previous version (here ModuleSetup + JelixParameters), and load
+        // other classes (here SetupJelix16) after the upgrade. so API is not the one we expected.
+        // so we should check if the new method getConfigFileName is here
+        if (method_exists($this->parameters, 'getConfigFileName')) {
+            $iniFileName = $this->parameters->getConfigFileName();
+        }
+        else {
+            $iniFileName = 'localconfig.ini.php';
+        }
         if (!$iniFileName) {
             $iniFileName = 'localconfig.ini.php';
         }
