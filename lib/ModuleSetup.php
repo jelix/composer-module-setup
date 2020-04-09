@@ -10,35 +10,28 @@ use Composer\Plugin\PluginEvents;
 use Composer\Script\ScriptEvents;
 use Composer\Installer\PackageEvent;
 
-
+/**
+ * Main class of the plugin for Compose.
+ *
+ * This class should load our classes only during onPost* methods,
+ * to be sure to load latest version of the plugin.
+ *
+ * @package Jelix\ComposerPlugin
+ */
 class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
-    
+
     const VERSION = 1;
     protected $composer;
     protected $io;
     protected $vendorDir;
-    protected $jsonInfosFile;
-    protected $fs;
+    protected $packages = array();
 
-    protected $moduleInfos = array();
-
-    /**
-     * @var JelixParameters
-     */
-    protected $jelixParameters = null;
 
     public function activate(Composer $composer, IOInterface $io)
     {
         $this->composer = $composer;
         $this->io = $io;
         $this->vendorDir = $this->composer->getConfig()->get('vendor-dir').DIRECTORY_SEPARATOR;
-
-        $this->jelixParameters = new JelixParameters($this->vendorDir);
-
-        $this->jsonInfosFile = $this->vendorDir.'jelix_modules_infos.json';
-        if (file_exists($this->jsonInfosFile)) {
-            $this->jelixParameters->loadFromFile($this->jsonInfosFile);
-        }
     }
 
     public static function getSubscribedEvents()
@@ -74,12 +67,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
             return;
         }
         $packagePath = $this->vendorDir.$installedPackage->getName();
-        try {
-            $this->jelixParameters->addPackage($installedPackage, $packagePath);
-        }
-        catch(ReaderException $e) {
-            $this->io->writeError($e->getMessage());
-        }
+        $this->packages[] = array('installed', $installedPackage->getName(), $installedPackage->getExtra(), $packagePath);
     }
 
     public function onPackageUpdated(PackageEvent $event)
@@ -95,12 +83,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
             return;
         }
         $packagePath = $this->vendorDir.$targetPackage->getName();
-        try {
-            $this->jelixParameters->addPackage($targetPackage, $packagePath);
-        }
-        catch(ReaderException $e) {
-            $this->io->writeError($e->getMessage());
-        }
+        $this->packages[] = array('updated', $targetPackage->getName(), $targetPackage->getExtra(), $packagePath);
     }
 
     public function onPackageUninstall(PackageEvent $event)
@@ -114,27 +97,50 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         ) {
             return;
         }
-        $this->jelixParameters->removePackage($removedPackage->getName());
+        $this->packages[] = array('removed', $removedPackage->getName());
+
     }
 
     public function onPostInstall(\Composer\Script\Event $event)
     {
+        $jelixParameters = new JelixParameters($this->vendorDir);
+        $jsonInfosFile = $this->vendorDir.'jelix_modules_infos.json';
+        if (file_exists($jsonInfosFile)) {
+            $jelixParameters->loadFromFile($jsonInfosFile);
+        }
+
+        foreach($this->packages as $packageInfo) {
+            $action = $packageInfo[0];
+            if ($action == 'removed') {
+                $jelixParameters->removePackage($packageInfo[1]);
+            }
+            else {
+                try {
+                    list($action, $name, $extra, $path) = $packageInfo;
+                    $jelixParameters->addPackage($name, $extra, $path, false);
+                } catch (ReaderException $e) {
+                    $this->io->writeError($e->getMessage());
+                }
+            }
+        }
+
         try {
-            $this->jelixParameters->addPackage($this->composer->getPackage(), getcwd(), true);
+            $appPackage = $this->composer->getPackage();
+            $jelixParameters->addPackage($appPackage->getName(), $appPackage->getExtra(), getcwd(), true);
         } catch (ReaderException $e) {
             $this->io->writeError($e->getMessage());
         }
 
-        $this->jelixParameters->saveToFile($this->jsonInfosFile);
+        $jelixParameters->saveToFile($jsonInfosFile);
 
-        if ($this->jelixParameters->getPackageParameters('jelix/jelix') ||
-            $this->jelixParameters->getPackageParameters('jelix/jelix-essential') ||
-            $this->jelixParameters->getPackageParameters('jelix/for-classic-package')  // deprecated
+        if ($jelixParameters->getPackageParameters('jelix/jelix') ||
+            $jelixParameters->getPackageParameters('jelix/jelix-essential') ||
+            $jelixParameters->getPackageParameters('jelix/for-classic-package')  // deprecated
         ) {
-            $setup = new SetupJelix17($this->jelixParameters);
+            $setup = new SetupJelix17($jelixParameters);
             $setup->setup();
         } else {
-            $setup = new SetupJelix16($this->jelixParameters);
+            $setup = new SetupJelix16($jelixParameters);
             $setup->setup();
         }
     }
