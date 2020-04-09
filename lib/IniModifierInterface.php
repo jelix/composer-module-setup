@@ -1,10 +1,8 @@
 <?php
 
 /**
- * Originaly from the jelix/inifile, but include it directly for the need
- * of the composer plugin
  * @author     Laurent Jouanneau
- * @copyright  2016 Laurent Jouanneau
+ * @copyright  2016-2020 Laurent Jouanneau
  *
  * @link       http://jelix.org
  * @licence    http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public Licence, see LICENCE file
@@ -13,17 +11,16 @@
 namespace Jelix\ComposerPlugin;
 
 /**
- * Interface for classes that allow to modify an ini file
+ * Interface for classes that allow to modify an ini file.
  */
-interface IniModifierInterface
+interface IniModifierInterface extends IniReaderInterface
 {
-
     /**
      * modify an option in the ini file. If the option doesn't exist,
      * it is created.
      *
      * @param string $name    the name of the option to modify
-     * @param string $value   the new value
+     * @param mixed  $value   the new value
      * @param string $section the section where to set the item. 0 is the global section
      * @param int    $key     for option which is an item of array, the key in the array. '' to just add a value in the array
      */
@@ -38,8 +35,10 @@ interface IniModifierInterface
     public function setValues($values, $section = 0);
 
     /**
-     * remove an option in the ini file. It can remove an entire section if you give
-     * an empty value as $name, and a $section name.
+     * remove an option in the ini file.
+     *
+     * It can remove an entire section if you give an empty value as $name,
+     * and a $section name. (deprecated behavior, see removeSection())
      *
      * @param string $name    the name of the option to remove, or null to remove an entire section
      * @param string $section the section where to remove the value, or the section to remove
@@ -50,25 +49,13 @@ interface IniModifierInterface
     public function removeValue($name, $section = 0, $key = null, $removePreviousComment = true);
 
     /**
-     * return the value of an option in the ini file. If the option doesn't exist,
-     * it returns null.
+     * remove a section from the ini file.
      *
-     * @param string $name    the name of the option to retrieve
-     * @param string $section the section where the option is. 0 is the global section
-     * @param int    $key     for option which is an item of array, the key in the array
+     * @param string $section the section where to remove the value, or the section to remove
      *
-     * @return mixed the value
+     * @since 2.5.0
      */
-    public function getValue($name, $section = 0, $key = null);
-
-    /**
-     * return all values of a section in the ini file.
-     *
-     * @param string $section the section from wich we want values. 0 is the global section
-     *
-     * @return array the list of values, $key=>$value
-     */
-    public function getValues($section = 0);
+    public function removeSection($section = 0, $removePreviousComment = true);
 
     /**
      * save the ini file.
@@ -83,5 +70,4 @@ interface IniModifierInterface
      * @since 1.2
      */
     public function isModified();
-
 }
