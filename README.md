@@ -15,7 +15,7 @@ In the composer.json of your application, declare the plugin
 ```json
 {
     "require": {
-        "jelix/composer-module-setup": "^0.5.0"
+        "jelix/composer-module-setup": "^0.6.0"
     }
 }
 ```
@@ -76,7 +76,7 @@ the composer.json of the application:
 ```json
 {
     "require": {
-        "jelix/composer-module-setup": "^0.5.0"
+        "jelix/composer-module-setup": "^0.6.0"
     },
     "extra": {
         "jelix": {
@@ -123,21 +123,22 @@ parameter in the configuration file is not supported anymore.
 ## In Jelix 1.6.x equal or higher than 1.6.9
 
 The composer plugin declares automatically modules and plugins directory into 
-the localconfig.ini.php file, in `modulesPath` and `pluginsPath` properties, 
-and also in the `modules` section.
+the localconfig.ini.php file or into the mainconfig.ini.php file, 
+in `modulesPath` and `pluginsPath` properties, and also in the `modules` section.
 
-However, at the application level, the composer.json should also content the path
+However, at the application level, the composer.json may also content the path
 to the application directory (the directory containing the project.xml etc), and
-the path to the var/config directory, if the directory containing the composer.json
-file is not the application directory and/or if the var/config is not in the
-application directory. You must set these path into `app-dir` and `var-config-dir`
-(may be related to the composer.json directory)
+the path to the var/config directory.
 
+
+So if the directory containing the composer.json file is not the application 
+directory and/or if the var/config is not in the application directory, you must 
+set these path into `app-dir` and `var-config-dir` (path relative to the composer.json directory)
 
 ```json
 {
     "require": {
-        "jelix/composer-module-setup": "^0.5.0"
+        "jelix/composer-module-setup": "^0.6.0"
     },
     "extra": {
         "jelix": {
@@ -149,6 +150,24 @@ application directory. You must set these path into `app-dir` and `var-config-di
 }
 ```
 
+You can also indicate if you want that the plugin modify localconfig.ini.php 
+or mainconfig.ini.php. By default it is localconfig.ini.php. Indicate the
+configuration filename into `config-file-16`:
 
 
+```json
+{
+    "require": {
+        "jelix/composer-module-setup": "^0.6.0"
+    },
+    "extra": {
+        "jelix": {
+            "app-dir" : "myapp/",
+            "var-config-dir" : "/var/lib/myapp/config/",
+            "modules-dir" : [],
+            "config-file-16": "mainconfig.ini.php"
+        }
+    }
+}
+```
 
