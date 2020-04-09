@@ -119,15 +119,15 @@ class JelixParameters {
                 if (!$this->appDir || !file_exists($this->appDir)) {
                     throw new ReaderException("Error in composer.json of ".$package->getName().": extra/jelix/app-dir is not set or does not contain a valid path");
                 }
-                if (!file_exists($this->appDir.'project.xml')) {
+                if (!file_exists($this->appDir.'/project.xml')) {
                     throw new ReaderException("Error in composer.json of ".$package->getName().": extra/jelix/app-dir is not a path to a Jelix application");
                 }
 
             }
             else {
                 $this->appDir = $packagePath;
-                if (!file_exists($this->appDir.'project.xml')) {
-                    throw new ReaderException("the directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/app-dir parameter");
+                if (!file_exists($this->appDir.'/project.xml')) {
+                    throw new ReaderException("The directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/app-dir parameter");
                 }
             }
             $this->appDir = rtrim($this->appDir, "/")."/";
@@ -147,13 +147,13 @@ class JelixParameters {
                 $this->varConfigDir = rtrim($this->varConfigDir, "/")."/";
             }
             else if (!file_exists($this->varConfigDir)) {
-                throw new ReaderException("the var/config directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/var-config-dir parameter");
+                throw new ReaderException("The var/config directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/var-config-dir parameter");
             }
 
             if (isset($extra['jelix']['config-file-16'])) {
                 $this->configurationFileName = $extra['jelix']['config-file-16'];
                 if ($this->configurationFileName && !file_exists($this->varConfigDir.$this->configurationFileName)) {
-                    throw new ReaderException("the configuration file name indicated into extra/jelix/config-file-16 does not exists into the var/config/ directory of the application");
+                    throw new ReaderException("The configuration file name indicated into extra/jelix/config-file-16 does not exists into the var/config/ directory of the application");
                 }
             }
         }
