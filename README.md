@@ -15,7 +15,7 @@ In the composer.json of your application, declare the plugin
 ```json
 {
     "require": {
-        "jelix/composer-module-setup": "^0.6.0"
+        "jelix/composer-module-setup": "^0.6.1"
     }
 }
 ```
@@ -76,7 +76,7 @@ the composer.json of the application:
 ```json
 {
     "require": {
-        "jelix/composer-module-setup": "^0.6.0"
+        "jelix/composer-module-setup": "^0.6.1"
     },
     "extra": {
         "jelix": {
@@ -138,7 +138,7 @@ set these path into `app-dir` and `var-config-dir` (path relative to the compose
 ```json
 {
     "require": {
-        "jelix/composer-module-setup": "^0.6.0"
+        "jelix/composer-module-setup": "^0.6.1"
     },
     "extra": {
         "jelix": {
@@ -158,7 +158,7 @@ configuration filename into `config-file-16`:
 ```json
 {
     "require": {
-        "jelix/composer-module-setup": "^0.6.0"
+        "jelix/composer-module-setup": "^0.6.1"
     },
     "extra": {
         "jelix": {
