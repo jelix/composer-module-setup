@@ -26,9 +26,10 @@ class JelixParameters {
      */
     protected $appDir = null;
 
+    protected $autoconfig16 = array();
 
     /**
-     * name of the configuration file taht will be modified to declare
+     * name of the configuration file that will be modified to declare
      * module paths. Only for Jelix 1.6
      * @var string $configurationFileName
      */

@@ -66,7 +66,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         ) {
             return;
         }
-        $packagePath = $this->vendorDir.$installedPackage->getName();
+        $packagePath = $this->vendorDir.$installedPackage->getPrettyName();
         $this->packages[] = array('installed', $installedPackage->getName(), $installedPackage->getExtra(), $packagePath);
     }
 
@@ -82,7 +82,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         ) {
             return;
         }
-        $packagePath = $this->vendorDir.$targetPackage->getName();
+        $packagePath = $this->vendorDir.$targetPackage->getPrettyName();
         $this->packages[] = array('updated', $targetPackage->getName(), $targetPackage->getExtra(), $packagePath);
     }
 
