@@ -38,6 +38,11 @@ class JelixPackageParameters {
         $this->isAppPackage = $isAppPackage;
     }
 
+    function getPackageName()
+    {
+        return $this->packageName;
+    }
+
     function isApp()
     {
         return $this->isAppPackage;
@@ -98,7 +103,7 @@ class JelixPackageParameters {
         if (isset($this->packageModulesAccess[$packageName])) {
             $list = array();
             foreach($this->packageModulesAccess[$packageName] as $module => $access) {
-                $list[] = new JelixModuleAccess($module, $access);
+                $list[$module] = new JelixModuleAccess($module, $access);
             }
             return $list;
         }
@@ -106,24 +111,41 @@ class JelixPackageParameters {
     }
 
     /**
-     * @param string $appName the id of the app
+     * @param string $composerAppName the id of the app in composer.json
+     * @param string $jelixAppName the Jelix id of the app (from project.xml)
      *
      * @return JelixModuleAccess[]
      */
-    function getModulesAccessForApp($appName)
+    function getModulesAccessForApp($composerAppName, $jelixAppName)
     {
-        if (!isset($this->appModulesAccess[$appName])) {
-            $appName = '__any_app';
+        $moduleAccess = array();
+        if (isset($this->appModulesAccess['__any_app'])) {
+            $moduleAccess = $this->appModulesAccess['__any_app'];
         }
 
-        if (isset($this->appModulesAccess[$appName])) {
-            $list = array();
-            foreach($this->appModulesAccess[$appName] as $module => $access) {
-                $list[] = new JelixModuleAccess($module, $access);
-            }
-            return $list;
+        $appModulesAccess = array();
+        if (isset($this->appModulesAccess[$composerAppName])) {
+            $appModulesAccess = $this->appModulesAccess[$composerAppName];
         }
-        return array();
+        else if (isset($this->appModulesAccess[$jelixAppName])) {
+            $appModulesAccess = $this->appModulesAccess[$jelixAppName];
+        }
+
+        foreach($appModulesAccess as $module => $access) {
+            if (isset($moduleAccess[$module])) {
+                $moduleAccess[$module] = array_merge($moduleAccess[$module], $access);
+            }
+            else {
+                $moduleAccess[$module] = $access;
+            }
+        }
+
+
+        $list = array();
+        foreach($moduleAccess as $module => $access) {
+            $list[$module] = new JelixModuleAccess($module, $access);
+        }
+        return $list;
     }
 
     function getModulesDirs()

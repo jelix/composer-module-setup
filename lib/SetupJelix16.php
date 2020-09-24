@@ -255,7 +255,7 @@ class SetupJelix16 {
             if (count($modulesAccess) == 0) {
                 // no, so let's retrieve entrypoint configuration from the
                 // package
-                $modulesAccess = $package->getModulesAccessForApp($this->appId);
+                $modulesAccess = $package->getModulesAccessForApp($appPackage->getPackageName(), $this->appId);
             }
             if (count($modulesAccess) == 0) {
                 // no entrypoint configuration for the package, let's ignore it
@@ -263,7 +263,7 @@ class SetupJelix16 {
             }
 
             foreach ($modulesAccess as $module=>$access) {
-                foreach($access as $ep => $accessValue) {
+                foreach($access->getAccess() as $ep => $accessValue) {
                     if ($ep == '__global') {
                         $localIni->setValue($module.'.access', $accessValue, 'modules');
                     }

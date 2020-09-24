@@ -125,8 +125,6 @@ In module packages, you can indicate on which entrypoint the module should be en
 In the composer.json of the application, you can also indicate the same informations
 for each modules, when a module does not provide an `"autoconfig-access-16"` configuration 
 
-
-
 ```json
 {
     "extra": {
@@ -152,7 +150,8 @@ for each modules, when a module does not provide an `"autoconfig-access-16"` con
 }
 ```
 
-
+If the package has already an `"autoconfig-access-16"` configuration, this
+`modules-autoconfig-access-16` configuration has priority over it.
 
 ## In Jelix 1.7 and higher
 

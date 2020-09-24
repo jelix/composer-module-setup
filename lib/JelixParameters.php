@@ -63,7 +63,7 @@ class JelixParameters {
                 ),
                 $infos
             );
-            $parameters = new JelixPackageParameters($package, $content['is_app']);
+            $parameters = new JelixPackageParameters($package, $content['is-app']);
             $parameters->setModulesDirs($content['modules-dirs']);
             $parameters->setPluginsDirs($content['plugins-dirs']);
             $parameters->setSingleModuleDirs($content['modules']);
