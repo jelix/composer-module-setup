@@ -1,5 +1,11 @@
 
 
+Version 0.7.0
+=============
+
+- Support of automatic setup of module access in the configuration for Jelix 1.6.
+  See `autoconfig-access-16` and `modules-autoconfig-access-16` parameters.
+
 
 Version 0.6.1
 =============
