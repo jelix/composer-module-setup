@@ -7,6 +7,10 @@ use Composer\Package\PackageInterface;
 class JelixParameters {
 
     const VERSION = 1;
+
+    /**
+     * @var JelixPackageParameters[]
+     */
     protected $packagesInfos = array();
 
     protected $fs;
@@ -48,14 +52,23 @@ class JelixParameters {
             return;
         }
         foreach($content['packages'] as $package => $infos) {
-            $content = array_merge_recursive(array('modules-dirs'=>array(),
-                                        'plugins-dirs'=>array(),
-                                        'modules'=>array()),
-                                    $infos);
-            $parameters = new JelixPackageParameters($package);
+            $content = array_merge_recursive(
+                array(
+                    'is-app'=>false,
+                    'modules-dirs'=>array(),
+                     'plugins-dirs'=>array(),
+                     'modules'=>array(),
+                    'autoconfig-access-16'=>array(),
+                    'modules-autoconfig-access-16'=>array()
+                ),
+                $infos
+            );
+            $parameters = new JelixPackageParameters($package, $content['is_app']);
             $parameters->setModulesDirs($content['modules-dirs']);
             $parameters->setPluginsDirs($content['plugins-dirs']);
             $parameters->setSingleModuleDirs($content['modules']);
+            $parameters->setAppModulesAccess($content['autoconfig-access-16']);
+            $parameters->setPackageModulesAccess($content['modules-autoconfig-access-16']);
             $this->packagesInfos[$package] = $parameters;
         }
     }
@@ -67,7 +80,9 @@ class JelixParameters {
             $content['packages'][$package] = array(
                 'modules-dirs'=>$parameters->getModulesDirs(),
                 'plugins-dirs'=>$parameters->getPluginsDirs(),
-                'modules'=>$parameters->getSingleModuleDirs()
+                'modules'=>$parameters->getSingleModuleDirs(),
+                'autoconfig-access-16'=>$parameters->getAppModulesAccess(),
+                'modules-autoconfig-access-16'=>$parameters->getPackageModulesAccess(),
             );
         }
         file_put_contents($filepath, json_encode($content, JSON_PRETTY_PRINT));
@@ -99,7 +114,7 @@ class JelixParameters {
      */
     function addPackage($packageName, $extra, $packagePath, $appPackage=false)
     {
-        $parameters = new JelixPackageParameters($packageName);
+        $parameters = new JelixPackageParameters($packageName, $appPackage);
         $this->packagesInfos[$packageName] = $parameters;
 
         if (!isset($extra['jelix'])) {
@@ -110,6 +125,7 @@ class JelixParameters {
         }
 
         if ($appPackage) {
+            // read informations from the composer.json of the application
 
             if (isset($extra['jelix']['app-dir'])) {
                 if ($this->fs->isAbsolutePath($extra['jelix']['app-dir'])) {
@@ -158,7 +174,55 @@ class JelixParameters {
                     throw new ReaderException("The configuration file name indicated into extra/jelix/config-file-16 does not exists into the var/config/ directory of the application");
                 }
             }
+
+            if (isset($extra['jelix']['modules-autoconfig-access-16'])) {
+                $modulesAccess = $extra['jelix']['modules-autoconfig-access-16'];
+                if (is_array($modulesAccess)) {
+                    $cleanedModulesAccess = array();
+                    foreach($extra['jelix']['modules-autoconfig-access-16'] as $package => $moduleAccess) {
+                        if (!is_string($package) || !is_array($moduleAccess)) {
+                            continue;
+                        }
+                        foreach($moduleAccess as $module =>$access) {
+                            if (is_array($access)) {
+                                if (!array_key_exists($package, $cleanedModulesAccess)) {
+                                    $cleanedModulesAccess[$package] = array();
+                                }
+                                $cleanedModulesAccess[$package][$module] = $access;
+                            }
+                        }
+                    }
+                    $parameters->setPackageModulesAccess($cleanedModulesAccess);
+                }
+            }
+
         }
+        else {
+            // read informations from the composer.json of a module package
+
+            if (isset($extra['jelix']['autoconfig-access-16'])) {
+                $modulesAccess = $extra['jelix']['autoconfig-access-16'];
+                if (is_array($modulesAccess)) {
+                    $cleanedModulesAccess = array();
+                    foreach($extra['jelix']['autoconfig-access-16'] as $app => $moduleAccess) {
+                        if (!is_string($app) || !is_array($moduleAccess)) {
+                            continue;
+                        }
+                        foreach($moduleAccess as $module =>$access) {
+                            if (is_array($access)) {
+                                if (!array_key_exists($app, $cleanedModulesAccess)) {
+                                    $cleanedModulesAccess[$app] = array();
+                                }
+                                $cleanedModulesAccess[$app][$module] = $access;
+                            }
+                        }
+                    }
+                    $parameters->setAppModulesAccess($cleanedModulesAccess);
+                }
+            }
+        }
+
+        // read informations that can be in any composer.json
 
         if (isset($extra['jelix']['modules-dir'])) {
             if (!is_array($extra['jelix']['modules-dir'])) {
@@ -208,6 +272,28 @@ class JelixParameters {
         if(isset($this->packagesInfos[$packageName]))
         {
             return $this->packagesInfos[$packageName];
+        }
+        return null;
+    }
+
+    /**
+     * @return JelixPackageParameters[]
+     */
+    function getPackages()
+    {
+        return $this->packagesInfos;
+    }
+
+    /**
+     * @return JelixPackageParameters
+     */
+    function getApplicationPackage()
+    {
+        foreach($this->packagesInfos as $package)
+        {
+            if ($package->isApp()) {
+                return $package;
+            }
         }
         return null;
     }

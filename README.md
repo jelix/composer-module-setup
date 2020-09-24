@@ -94,6 +94,66 @@ the composer.json of the application:
 }
 ```
 
+
+## Enable modules on entrypoints automatically (jelix 1.6 only)
+
+In module packages, you can indicate on which entrypoint the module should be enabled.
+
+```json
+{
+    "extra": {
+        "jelix": {
+            "autoconfig-access-16" : {
+                "__any_app" : {
+                    "<modulename>": {
+                        "__global": 1
+                    }
+                },
+                "app/identifiant1" : {
+                    "<modulename>": {
+                        "__global": 1,
+                        "index" : 2,
+                        "admin" : 1   
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+In the composer.json of the application, you can also indicate the same informations
+for each modules, when a module does not provide an `"autoconfig-access-16"` configuration 
+
+
+
+```json
+{
+    "extra": {
+        "jelix": {
+            "modules-autoconfig-access-16" : {
+                "package/name1" : {
+                    "<modulename>": {
+                        "__global": 1,
+                        "index" : 2,
+                        "admin" : 1   
+                    }
+                },
+                "package/name2" : {
+                    "<modulename>": {
+                        "__global": 1,
+                        "index" : 2,
+                        "admin" : 1   
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+
+
 ## In Jelix 1.7 and higher
 
 In your application.init.php, you should include the jelix_app_path.php:
