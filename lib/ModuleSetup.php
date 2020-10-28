@@ -4,6 +4,7 @@ namespace Jelix\ComposerPlugin;
 
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
+use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Plugin\PluginEvents;
@@ -37,13 +38,13 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
     public static function getSubscribedEvents()
     {
         return array(
-            ScriptEvents::POST_PACKAGE_INSTALL => array(
+            PackageEvents::POST_PACKAGE_INSTALL => array(
                 array('onPackageInstalled', 0)
             ),
-            ScriptEvents::POST_PACKAGE_UPDATE => array(
+            PackageEvents::POST_PACKAGE_UPDATE => array(
                 array('onPackageUpdated', 0)
             ),
-            ScriptEvents::PRE_PACKAGE_UNINSTALL => array(
+            PackageEvents::PRE_PACKAGE_UNINSTALL => array(
                 array('onPackageUninstall', 0)
             ),
             ScriptEvents::POST_INSTALL_CMD => array(
@@ -148,5 +149,15 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
     public function onPostUpdate(\Composer\Script\Event $event)
     {
         $this->onPostInstall($event);
+    }
+
+    public function deactivate(Composer $composer, IOInterface $io)
+    {
+
+    }
+
+    public function uninstall(Composer $composer, IOInterface $io)
+    {
+
     }
 }
