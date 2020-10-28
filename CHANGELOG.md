@@ -1,4 +1,9 @@
 
+Version 1.0.0
+=============
+
+- Compatibility with Composer 2.0
+
 
 Version 0.7.0
 =============
