@@ -2,6 +2,7 @@
 
 namespace Jelix\ComposerPlugin;
 use Composer\Util\Filesystem;
+use Jelix\ComposerPlugin\Ini\IniModifier;
 
 class SetupJelix16 {
 

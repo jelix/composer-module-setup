@@ -8,7 +8,7 @@
  * @licence    http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public Licence, see LICENCE file
  */
 
-namespace Jelix\ComposerPlugin;
+namespace Jelix\ComposerPlugin\Ini;
 
 /**
  * utility class to modify an ini file by preserving comments, whitespace..

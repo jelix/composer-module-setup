@@ -8,7 +8,7 @@
  * @licence    http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public Licence, see LICENCE file
  */
 
-namespace Jelix\ComposerPlugin;
+namespace Jelix\ComposerPlugin\Ini;
 
 /**
  * Interface for classes that allow to modify an ini file.
