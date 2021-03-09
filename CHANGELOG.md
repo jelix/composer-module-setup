@@ -1,4 +1,9 @@
 
+Version 1.0.1
+=============
+
+- Fix: Jelix 1.6 configuration should be updated when a package is removed
+
 Version 1.0.0
 =============
 
