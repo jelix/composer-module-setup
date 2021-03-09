@@ -13,6 +13,11 @@ class JelixParameters {
      */
     protected $packagesInfos = array();
 
+    /**
+     * @var JelixPackageParameters[]
+     */
+    protected $removedPackagesInfos = array();
+
     protected $fs;
 
     /**
@@ -117,6 +122,11 @@ class JelixParameters {
         $parameters = new JelixPackageParameters($packageName, $appPackage);
         $this->packagesInfos[$packageName] = $parameters;
 
+        if(isset($this->removedPackagesInfos[$packageName]))
+        {
+            unset($this->removedPackagesInfos[$packageName]);
+        }
+
         if (!isset($extra['jelix'])) {
             if ($appPackage) {
                 $this->appDir = $packagePath;
@@ -200,26 +210,7 @@ class JelixParameters {
         else {
             // read informations from the composer.json of a module package
 
-            if (isset($extra['jelix']['autoconfig-access-16'])) {
-                $modulesAccess = $extra['jelix']['autoconfig-access-16'];
-                if (is_array($modulesAccess)) {
-                    $cleanedModulesAccess = array();
-                    foreach($extra['jelix']['autoconfig-access-16'] as $app => $moduleAccess) {
-                        if (!is_string($app) || !is_array($moduleAccess)) {
-                            continue;
-                        }
-                        foreach($moduleAccess as $module =>$access) {
-                            if (is_array($access)) {
-                                if (!array_key_exists($app, $cleanedModulesAccess)) {
-                                    $cleanedModulesAccess[$app] = array();
-                                }
-                                $cleanedModulesAccess[$app][$module] = $access;
-                            }
-                        }
-                    }
-                    $parameters->setAppModulesAccess($cleanedModulesAccess);
-                }
-            }
+            $this->readAutoconfigAccess($parameters, $extra);
         }
 
         // read informations that can be in any composer.json
@@ -261,11 +252,39 @@ class JelixParameters {
         }
     }
 
-    function removePackage($packageName) {
+
+    protected function readAutoconfigAccess(JelixPackageParameters $parameters, $extra) {
+        if (isset($extra['jelix']['autoconfig-access-16'])) {
+            $modulesAccess = $extra['jelix']['autoconfig-access-16'];
+            if (is_array($modulesAccess)) {
+                $cleanedModulesAccess = array();
+                foreach($extra['jelix']['autoconfig-access-16'] as $app => $moduleAccess) {
+                    if (!is_string($app) || !is_array($moduleAccess)) {
+                        continue;
+                    }
+                    foreach($moduleAccess as $module =>$access) {
+                        if (is_array($access)) {
+                            if (!array_key_exists($app, $cleanedModulesAccess)) {
+                                $cleanedModulesAccess[$app] = array();
+                            }
+                            $cleanedModulesAccess[$app][$module] = $access;
+                        }
+                    }
+                }
+                $parameters->setAppModulesAccess($cleanedModulesAccess);
+            }
+        }
+    }
+
+    function removePackage($packageName, $extra) {
         if(isset($this->packagesInfos[$packageName]))
         {
             unset($this->packagesInfos[$packageName]);
         }
+
+        $parameters = new JelixPackageParameters($packageName, false);
+        $this->removedPackagesInfos[$packageName] = $parameters;
+        $this->readAutoconfigAccess($parameters, $extra);
     }
 
     function getPackageParameters($packageName) {
@@ -282,6 +301,14 @@ class JelixParameters {
     function getPackages()
     {
         return $this->packagesInfos;
+    }
+
+    /**
+     * @return JelixPackageParameters[]
+     */
+    function getRemovedPackages()
+    {
+        return $this->removedPackagesInfos;
     }
 
     /**

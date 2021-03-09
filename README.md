@@ -122,6 +122,9 @@ In module packages, you can indicate on which entrypoint the module should be en
 }
 ```
 
+`app/identifiant1` must be the application id that is indicated into the `project.xml`
+file ( `id` attribute of the `<info>` element).
+
 In the composer.json of the application, you can also indicate the same informations
 for each modules, when a module does not provide an `"autoconfig-access-16"` configuration 
 

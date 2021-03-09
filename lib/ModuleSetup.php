@@ -98,7 +98,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         ) {
             return;
         }
-        $this->packages[] = array('removed', $removedPackage->getName());
+        $this->packages[] = array('removed', $removedPackage->getName(), $removedPackage->getExtra());
 
     }
 
@@ -113,7 +113,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         foreach($this->packages as $packageInfo) {
             $action = $packageInfo[0];
             if ($action == 'removed') {
-                $jelixParameters->removePackage($packageInfo[1]);
+                $jelixParameters->removePackage($packageInfo[1], $packageInfo[2]);
             }
             else {
                 try {

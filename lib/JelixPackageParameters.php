@@ -64,6 +64,8 @@ class JelixPackageParameters {
     }
 
     /**
+     * set module access by applications
+     *
      * @param  array  $list 'application_name'=>array('module_name'=>array("__global"=> 1, "index" => 2,...))
      */
     function setAppModulesAccess(array $list)
@@ -74,6 +76,8 @@ class JelixPackageParameters {
     }
 
     /**
+     * set module access by package
+     *
      * @param  array  $list 'package_name'=>array('module_name'=>array("__global"=> 1, "index" => 2,...))
      */
     function setPackageModulesAccess(array $list)

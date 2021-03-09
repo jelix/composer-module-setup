@@ -277,5 +277,41 @@ class SetupJelix16 {
                 }
             }
         }
+
+        foreach($this->parameters->getRemovedPackages() as $packageName => $package)
+        {
+            if (!method_exists($package, 'isApp')) {
+                continue;
+            }
+            if ($package->isApp()) {
+                continue;
+            }
+            // let's see if the application defines configuration of entrypoint
+            // for the package
+            $modulesAccess = $appPackage->getModulesAccessForPackage($packageName);
+            if (count($modulesAccess) == 0) {
+                // no, so let's retrieve entrypoint configuration from the
+                // package
+                $modulesAccess = $package->getModulesAccessForApp($appPackage->getPackageName(), $this->appId);
+            }
+            if (count($modulesAccess) == 0) {
+                // no entrypoint configuration for the package, let's ignore it
+                continue;
+            }
+
+            foreach ($modulesAccess as $module=>$access) {
+                foreach($access->getAccess() as $ep => $accessValue) {
+                    if ($ep == '__global') {
+                        $localIni->removeValue($module.'.access', 'modules');
+                    }
+                    else {
+                        $ep = str_replace('.php', '', $ep);
+                        if (isset($this->entryPoints[$ep])) {
+                            $this->entryPoints[$ep]->removeValue($module.'.access', 'modules');
+                        }
+                    }
+                }
+            }
+        }
     }
 }
