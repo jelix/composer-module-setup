@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://jelix.org/ns/project/1.0">
+    <info id="tests@tests" name="tests">
+        <version date="2021-03-17">0.1</version>
+        <label lang="en_US">Tests</label>
+        <description lang="en_US"/>
+    </info>
+    <directories>
+        <config>./var/config/</config>
+        <log>./var/log/</log>
+        <var>./var/</var>
+        <www>./www/</www>
+        <temp>../tmp/</temp>
+    </directories>
+    <entrypoints>
+        <entry file="index.php" config="index/config.ini.php"/>
+        <entry file="admin.php" config="admin/config.ini.php" type="classic"/>
+        <entry file="script.php" config="cmdline/script.ini.php" type="cmdline"/>
+    </entrypoints>
+</project>

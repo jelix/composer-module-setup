@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "packages": {
+        "jelix\/test1-module": {
+            "modules-dirs": [
+                "jelix\/test1-module\/modules"
+            ],
+            "plugins-dirs": [],
+            "modules": [],
+            "autoconfig-access-16": [],
+            "modules-autoconfig-access-16": []
+        }
+    }
+}

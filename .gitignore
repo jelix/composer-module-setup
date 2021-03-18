@@ -2,6 +2,6 @@ TAGS
 .DS_Store
 *.komodoproject
 .komodotools
-vendor/
+./vendor/
 composer.lock
 .idea

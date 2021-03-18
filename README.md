@@ -195,7 +195,8 @@ the path to the var/config directory.
 
 So if the directory containing the composer.json file is not the application 
 directory and/or if the var/config is not in the application directory, you must 
-set these path into `app-dir` and `var-config-dir` (path relative to the composer.json directory)
+set these paths into `app-dir` and `var-config-dir`. Path should be
+relative to the composer.json directory, or can be absolute.
 
 ```json
 {

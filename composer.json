@@ -15,7 +15,9 @@
         "composer-plugin-api": "^2.0"
     },
     "require-dev": {
-        "composer/composer": "^2.0.3"
+        "composer/composer": "^2.0.3",
+        "phpunit/phpunit": "9.5.*",
+        "jelix/file-utilities": "1.8.*"
     },
     "autoload": {
         "psr-4": { "Jelix\\ComposerPlugin\\": "lib/" }
