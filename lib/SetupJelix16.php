@@ -57,7 +57,7 @@ class SetupJelix16 {
         }
 
         $this->readProjectXml();
-        $ini = $this->loadConfigFile();
+        $ini = $this->loadLocalConfigFile();
         $configDir = $this->parameters->getVarConfigDir();
 
         $vendorPath = $this->getFinalPath('./');
@@ -130,7 +130,7 @@ class SetupJelix16 {
      * @return IniModifier
      * @throws \Exception
      */
-    protected function loadConfigFile()
+    protected function loadLocalConfigFile()
     {
         $configDir = $this->parameters->getVarConfigDir();
 
@@ -155,6 +155,20 @@ class SetupJelix16 {
         return $ini;
     }
 
+    /**
+     * @return IniModifier
+     * @throws \Exception
+     */
+    protected function loadMainConfigFile()
+    {
+        $configDir = $this->parameters->getVarConfigDir();
+        $iniFileName= $configDir.'mainconfig.ini.php';
+        if (!file_exists($iniFileName)) {
+            throw new \Exception('mainconfig.ini.php does not exist');
+        }
+        $ini = new IniModifier($iniFileName);
+        return $ini;
+    }
 
     protected function getCurrentModulesPath($configDir, $localIni, $vendorPath) {
 
@@ -201,7 +215,6 @@ class SetupJelix16 {
         return $list;
     }
 
-
     protected function getFinalPath($path) {
         $appDir = $this->parameters->getAppDir();
         $vendorDir = $this->parameters->getVendorDir();
@@ -241,7 +254,7 @@ class SetupJelix16 {
         }
 
         $appPackage = $this->parameters->getApplicationPackage();
-
+        $modulesUrlEngine = array();
         foreach($this->parameters->getPackages() as $packageName => $package)
         {
             if (!method_exists($package, 'isApp')) {
@@ -264,17 +277,53 @@ class SetupJelix16 {
             }
 
             foreach ($modulesAccess as $module=>$access) {
-                foreach($access->getAccess() as $ep => $accessValue) {
-                    if ($ep == '__global') {
-                        $localIni->setValue($module.'.access', $accessValue, 'modules');
+
+                $accessList = $access->getAccess();
+                $globalAccessValue = 0;
+                if (isset($accessList['__global'])) {
+                    $globalAccessValue = $accessList['__global'];
+                    if ($globalAccessValue == 2) {
+                        $modulesUrlEngine[$module] = '__default_index';
                     }
-                    else {
-                        $ep = str_replace('.php', '', $ep);
+                }
+
+                foreach($accessList as $ep => $accessValue) {
+                    if ($ep != '__global') {
                         if (isset($this->entryPoints[$ep])) {
                             $this->entryPoints[$ep]->setValue($module.'.access', $accessValue, 'modules');
+                            if ($accessValue == 2 && (!isset($modulesUrlEngine[$module]) || $modulesUrlEngine[$module] == '__default_index')) {
+                                $modulesUrlEngine[$module] = $ep;
+                            }
                         }
                     }
                 }
+                if (!isset($modulesUrlEngine[$module])) {
+                    // no entry point has been selected for the url engine
+                    // globalAccessValue=1 or 0
+                    $modulesUrlEngine[$module] = 0;
+                }
+                elseif ($modulesUrlEngine[$module] == '__default_index') {
+                    // module is activated globally with access=2, but not
+                    // on any entrypoints. We should activate it on an entry point
+                    // first if index is free, we activate by default on index
+                    if (!isset($accessList['index']) &&
+                        isset($this->entryPoints['index'])
+                    ) {
+                        $modulesUrlEngine[$module] = 'index';
+                        $this->entryPoints[$ep]->setValue($module.'.access', 2, 'modules');
+                        $globalAccessValue = 1;
+                    }
+                    else { // we activate on the first entrypoint we find.
+                        $epList = array_diff_key($this->entryPoints, $accessList);
+                        if (count($epList) > 0) {
+                            $ep = array_keys($epList) [0];
+                            $modulesUrlEngine[$module] = $ep;
+                            $globalAccessValue = 1;
+                        }
+                    }
+                }
+                $localIni->setValue($module.'.access', $globalAccessValue, 'modules');
+
             }
         }
 
@@ -300,18 +349,69 @@ class SetupJelix16 {
             }
 
             foreach ($modulesAccess as $module=>$access) {
+                $modulesUrlEngine[$module] = 0;
                 foreach($access->getAccess() as $ep => $accessValue) {
                     if ($ep == '__global') {
                         $localIni->removeValue($module.'.access', 'modules');
                     }
-                    else {
-                        $ep = str_replace('.php', '', $ep);
-                        if (isset($this->entryPoints[$ep])) {
-                            $this->entryPoints[$ep]->removeValue($module.'.access', 'modules');
-                        }
+                    else if (isset($this->entryPoints[$ep])) {
+                        $this->entryPoints[$ep]->removeValue($module.'.access', 'modules');
                     }
                 }
             }
+        }
+
+        $this->updateUrlEngineConfig($localIni, $modulesUrlEngine);
+
+    }
+
+
+    /**
+     * @param $localConfig
+     * @param array $modulesMainEp module=>main entry point or 0 if deleted
+     *
+     * @throws \Exception
+     */
+    protected function updateUrlEngineConfig($localConfig, $modulesMainEp)
+    {
+        $epUrl = $localConfig->getValues('simple_urlengine_entrypoints');
+        if (!$epUrl) {
+            $mainConfigIni = $this->loadMainConfigFile();
+            $epUrl = $mainConfigIni->getValues('simple_urlengine_entrypoints');
+        }
+        foreach($epUrl as $ep => $listModules) {
+            $epUrl[$ep] = preg_split("/[\s,]+/", $listModules);
+            $epUrl[$ep]= array_diff($epUrl[$ep], array('')); // cleanup
+        }
+
+        $toRemove = array();
+
+        foreach ($modulesMainEp as $module => $mainEp)
+        {
+            $pattern = $module.'~*@classic';
+
+            foreach($epUrl as $ep => $listModules) {
+                if ($mainEp && $ep == $mainEp) {
+                    $epUrl[$ep][] = $pattern;
+                }
+                else {
+                    $toRemove[$ep][] = $pattern;
+                }
+            }
+        }
+
+        foreach ($toRemove as $ep => $removeList) {
+            if (count($removeList)) {
+                $epUrl[$ep] = array_diff($epUrl[$ep], $toRemove[$ep]);
+            }
+        }
+
+        foreach ($epUrl as $ep => $listModules) {
+            $listModules = array_unique($listModules);
+            if (array_search('@classic', $listModules) !== false) {
+                $listModules = ['@classic'];
+            }
+            $localConfig->setValue($ep,  implode(',',$listModules), 'simple_urlengine_entrypoints');
         }
     }
 }

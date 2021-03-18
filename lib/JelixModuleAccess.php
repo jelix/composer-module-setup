@@ -13,12 +13,16 @@ class JelixModuleAccess {
      * JelixModuleAccess constructor.
      *
      * @param string $moduleName
-     * @param array $access array("__global"=> 1, "index" => 2,...)
+     * @param array $accessList array("__global"=> 1, "index" => 2,...)
      */
-    function __construct($moduleName, $access)
+    function __construct($moduleName, $accessList)
     {
         $this->moduleName = $moduleName;
-        $this->access = $access;
+
+        foreach($accessList as $ep => $access) {
+            $ep = str_replace('.php', '', $ep);
+            $this->access[$ep] = $access;
+        }
     }
 
     public function getModuleName()

@@ -152,16 +152,31 @@ class JelixPackageParameters {
         return $list;
     }
 
+    /**
+     * list of path to modules directories
+     *
+     * @return string[] list of path
+     */
     function getModulesDirs()
     {
         return $this->modulesDirs;
     }
 
+    /**
+     * list of path to plugins directories
+     *
+     * @return string[] list of path
+     */
     function getPluginsDirs()
     {
         return $this->pluginsDirs;
     }
 
+    /**
+     * list of path to single module directories
+     *
+     * @return string[] list of path
+     */
     function getSingleModuleDirs()
     {
         return $this->singleModuleDirs;
