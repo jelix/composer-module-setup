@@ -1,4 +1,9 @@
 
+Version 1.0.2
+=============
+
+- Fix Jelix 1.6 configuration: url engine configuration was missing
+
 Version 1.0.1
 =============
 
