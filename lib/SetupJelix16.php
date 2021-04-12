@@ -287,16 +287,19 @@ class SetupJelix16 {
                     }
                 }
 
-                foreach($accessList as $ep => $accessValue) {
-                    if ($ep != '__global') {
-                        if (isset($this->entryPoints[$ep])) {
-                            $this->entryPoints[$ep]->setValue($module.'.access', $accessValue, 'modules');
-                            if ($accessValue == 2 && (!isset($modulesUrlEngine[$module]) || $modulesUrlEngine[$module] == '__default_index')) {
-                                $modulesUrlEngine[$module] = $ep;
-                            }
+                foreach($this->entryPoints as $epId => $ep) {
+                    if (isset($accessList[$epId])) {
+                        $accessValue = $accessList[$epId];
+                        $ep->setValue($module.'.access', $accessValue, 'modules');
+                        if ($accessValue == 2 && (!isset($modulesUrlEngine[$module]) || $modulesUrlEngine[$module] == '__default_index')) {
+                            $modulesUrlEngine[$module] = $epId;
                         }
                     }
+                    else {
+                        $ep->removeValue($module.'.access', 'modules');
+                    }
                 }
+
                 if (!isset($modulesUrlEngine[$module])) {
                     // no entry point has been selected for the url engine
                     // globalAccessValue=1 or 0
@@ -304,7 +307,7 @@ class SetupJelix16 {
                 }
                 elseif ($modulesUrlEngine[$module] == '__default_index') {
                     // module is activated globally with access=2, but not
-                    // on any entrypoints. We should activate it on an entry point
+                    // on any entrypoints. We should activate it on an entry point.
                     // first if index is free, we activate by default on index
                     if (!isset($accessList['index']) &&
                         isset($this->entryPoints['index'])
@@ -323,7 +326,6 @@ class SetupJelix16 {
                     }
                 }
                 $localIni->setValue($module.'.access', $globalAccessValue, 'modules');
-
             }
         }
 

@@ -1,4 +1,12 @@
 
+
+
+Version 1.0.3
+=============
+
+- Fix Jelix 1.6 configuration: activation of a module on an entrypoint should
+  be removed if a new version of the module does not use anymore the entry-point
+
 Version 1.0.2
 =============
 
