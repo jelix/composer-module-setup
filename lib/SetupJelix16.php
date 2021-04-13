@@ -282,7 +282,7 @@ class SetupJelix16 {
             return;
         }
 
-        $this->log("starts setup of module access");
+        $this->log("starts setup of modules access");
         $appPackage = $this->parameters->getApplicationPackage();
         $modulesUrlEngine = array();
         foreach($this->parameters->getPackages() as $packageName => $package)
@@ -304,7 +304,7 @@ class SetupJelix16 {
             }
             if (count($modulesAccess) == 0) {
                 // no entrypoint configuration for the package, let's ignore it
-                $this->log("setup access for package $packageName: no access definition");
+                $this->log("package $packageName: no setup access because no access definition");
                 continue;
             }
 
@@ -323,13 +323,13 @@ class SetupJelix16 {
                     if (isset($accessList[$epId])) {
                         $accessValue = $accessList[$epId];
                         $ep->setValue($module.'.access', $accessValue, 'modules');
-                        $this->log("set access $accessValue for module $module on $epId");
+                        $this->log("module $module: set access $accessValue on $epId");
                         if ($accessValue == 2 && (!isset($modulesUrlEngine[$module]) || $modulesUrlEngine[$module] == '__default_index')) {
                             $modulesUrlEngine[$module] = $epId;
                         }
                     }
                     else {
-                        $this->log("remove access for module $module on $epId");
+                        $this->log("module $module: remove access on $epId");
                         $ep->removeValue($module.'.access', 'modules');
                     }
                 }
@@ -348,7 +348,7 @@ class SetupJelix16 {
                     ) {
                         $modulesUrlEngine[$module] = 'index';
                         $this->entryPoints['index']->setValue($module.'.access', 2, 'modules');
-                        $this->log("set default access 2 for module $module on index");
+                        $this->log("module $module: set default access 2 on index");
                         $globalAccessValue = 1;
                     }
                     else { // we activate on the first entrypoint we find.
@@ -358,10 +358,11 @@ class SetupJelix16 {
                             $modulesUrlEngine[$module] = $ep;
                             $globalAccessValue = 1;
                             $this->entryPoints[$ep]->setValue($module.'.access', 2, 'modules');
-                            $this->log("set default access 2 for module $module on $ep");
+                            $this->log("module $module: set default access 2 on $ep");
                         }
                     }
                 }
+                $this->log("module $module: set global access $globalAccessValue");
                 $localIni->setValue($module.'.access', $globalAccessValue, 'modules');
             }
         }
@@ -384,12 +385,12 @@ class SetupJelix16 {
             }
             if (count($modulesAccess) == 0) {
                 // no entrypoint configuration for the package, let's ignore it
-                $this->log("remove access for package $packageName: no access definition");
+                $this->log("package $packageName: no remove access because no access definition");
                 continue;
             }
 
             foreach ($modulesAccess as $module=>$access) {
-                $this->log("remove access for $module");
+                $this->log("module $module: remove access");
                 $modulesUrlEngine[$module] = 0;
                 $localIni->removeValue($module.'.access', 'modules');
                 foreach ($this->entryPoints as $ep=>$ini) {
@@ -400,7 +401,7 @@ class SetupJelix16 {
 
         $this->updateUrlEngineConfig($localIni, $modulesUrlEngine);
 
-        $this->log("ends of setup of module access");
+        $this->log("ends of setup of modules access");
     }
 
 
@@ -430,9 +431,11 @@ class SetupJelix16 {
 
             foreach($epUrl as $ep => $listModules) {
                 if ($mainEp && $ep == $mainEp) {
+                    $this->log("urlengine $ep: add $pattern");
                     $epUrl[$ep][] = $pattern;
                 }
                 else {
+                    $this->log("urlengine $ep: remove $pattern");
                     $toRemove[$ep][] = $pattern;
                 }
             }
