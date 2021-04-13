@@ -6,6 +6,7 @@ use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
+use Composer\Package\PackageInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Plugin\PluginEvents;
 use Composer\Script\ScriptEvents;
@@ -56,15 +57,21 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         );
     }
 
+    protected function mustIgnorePackage(PackageInterface $package)
+    {
+        $result = $package->getType() == 'jelix-module' ||
+                  $package->getName() == 'jelix/jelix' ||
+                  $package->getName() == 'jelix/jelix-essential' ||
+                  $package->getName() == 'jelix/for-classic-package' // deprecated
+        ;
+        return !$result;
+    }
+
     public function onPackageInstalled(PackageEvent $event)
     {
         $installedPackage = $event->getOperation()->getPackage();
         //$this->io->write("=== ModuleSetup === installed package ".$installedPackage->getName()." (".$installedPackage->getType().")");
-        if ($installedPackage->getType() !== 'jelix-module' &&
-            $installedPackage->getName() !== 'jelix/jelix' &&
-            $installedPackage->getName() !== 'jelix/jelix-essential' &&
-            $installedPackage->getName() !== 'jelix/for-classic-package' // deprecated
-        ) {
+        if ($this->mustIgnorePackage($installedPackage)) {
             return;
         }
         $packagePath = $this->vendorDir.$installedPackage->getPrettyName();
@@ -76,11 +83,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         $initialPackage = $event->getOperation()->getInitialPackage();
         $targetPackage = $event->getOperation()->getTargetPackage();
         //$this->io->write("=== ModuleSetup === updated package ".$targetPackage->getName()." (".$targetPackage->getType().")");
-        if ($targetPackage->getType() !== 'jelix-module' &&
-            $targetPackage->getName() !== 'jelix/jelix' &&
-            $targetPackage->getName() !== 'jelix/jelix-essential' &&
-            $targetPackage->getName() !== 'jelix/for-classic-package' // deprecated
-        ) {
+        if ($this->mustIgnorePackage($targetPackage)) {
             return;
         }
         $packagePath = $this->vendorDir.$targetPackage->getPrettyName();
@@ -91,11 +94,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
     {
         // note to myself: the package files are still there at this step
         $removedPackage = $event->getOperation()->getPackage();
-        if ($removedPackage->getType() !== 'jelix-module' &&
-            $removedPackage->getName() !== 'jelix/jelix' &&
-            $removedPackage->getName() !== 'jelix/jelix-essential' &&
-            $removedPackage->getName() !== 'jelix/for-classic-package' // deprecated
-        ) {
+        if ($this->mustIgnorePackage($removedPackage)) {
             return;
         }
         $this->packages[] = array('removed', $removedPackage->getName(), $removedPackage->getExtra());
