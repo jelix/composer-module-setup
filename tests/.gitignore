@@ -1,3 +1,4 @@
 tmp/*
 !tmp/.empty
 /.phpunit.result.cache
+livetests
