@@ -4,6 +4,9 @@ namespace Jelix\ComposerPlugin;
 use Composer\Util\Filesystem;
 use Jelix\ComposerPlugin\Ini\IniModifier;
 
+/**
+ *  Setup configuration for a Jelix 1.6 application
+ */
 class SetupJelix16 {
 
     /**
@@ -29,9 +32,28 @@ class SetupJelix16 {
      */
     protected $appId = '';
 
-    function __construct(JelixParameters $parameters) {
+
+    /**
+     * @var DebugLogger|null
+     */
+    protected $logger;
+
+    /**
+     *
+     * @param  JelixParameters  $parameters
+     * @param  DebugLogger|null  $logger
+     */
+    function __construct(JelixParameters $parameters, $logger = null) {
         $this->parameters = $parameters;
         $this->fs = new Filesystem();
+        $this->logger = $logger;
+    }
+
+    protected function log($message)
+    {
+        if ($this->logger) {
+            $this->logger->log($message);
+        }
     }
 
     /**
@@ -47,6 +69,8 @@ class SetupJelix16 {
      * @throws \Exception
      */
     function setup() {
+
+        $this->log("--- Setup jelix16 starts");
         $allModulesDir = $this->parameters->getAllModulesDirs();
         $allPluginsDir = $this->parameters->getAllPluginsDirs();
         $allModules = $this->parameters->getAllSingleModuleDirs();
@@ -73,6 +97,7 @@ class SetupJelix16 {
         $modulesPath =  implode(',', array_unique($modulesPath));
         if ($ini->getValue('modulesPath') != $modulesPath) {
             $ini->setValue('modulesPath', $modulesPath);
+            $this->log('New modulesPath: '.$modulesPath);
         }
 
         // retrieve the current pluginsPath value
@@ -86,6 +111,7 @@ class SetupJelix16 {
         $pluginsPath = implode(',', array_unique($pluginsPath));
         if ($ini->getValue('pluginsPath') != $pluginsPath) {
             $ini->setValue('pluginsPath', $pluginsPath);
+            $this->log('New pluginsPath: '.$pluginsPath);
         }
 
         $modulePathToRemove = array();
@@ -102,7 +128,7 @@ class SetupJelix16 {
                 $moduleName = basename($path);
 
                 $path = $this->getFinalPath($path);
-
+                $this->log("setup path to module $moduleName");
                 if ($ini->getValue($moduleName.'.path', 'modules') != $path) {
                     $ini->setValue($moduleName.'.path', $path, 'modules');
                 }
@@ -116,6 +142,7 @@ class SetupJelix16 {
         // erase all "<module>.path" keys of modules that are not inside a package anymore
         foreach ($modulePathToRemove as $key => $path) {
             $ini->removeValue($key, 'modules');
+            $this->log("remove path to module $key");
         }
 
         $this->setupModuleAccess($ini);
@@ -124,6 +151,7 @@ class SetupJelix16 {
         foreach($this->entryPoints as $epIni) {
             $epIni->save();
         }
+        $this->log("Setup jelix16 ends");
     }
 
     /**
@@ -254,6 +282,7 @@ class SetupJelix16 {
             return;
         }
 
+        $this->log("starts setup of module access");
         $appPackage = $this->parameters->getApplicationPackage();
         $modulesUrlEngine = array();
         foreach($this->parameters->getPackages() as $packageName => $package)
@@ -275,6 +304,7 @@ class SetupJelix16 {
             }
             if (count($modulesAccess) == 0) {
                 // no entrypoint configuration for the package, let's ignore it
+                $this->log("setup access for package $packageName: no access definition");
                 continue;
             }
 
@@ -293,11 +323,13 @@ class SetupJelix16 {
                     if (isset($accessList[$epId])) {
                         $accessValue = $accessList[$epId];
                         $ep->setValue($module.'.access', $accessValue, 'modules');
+                        $this->log("set access $accessValue for module $module on $epId");
                         if ($accessValue == 2 && (!isset($modulesUrlEngine[$module]) || $modulesUrlEngine[$module] == '__default_index')) {
                             $modulesUrlEngine[$module] = $epId;
                         }
                     }
                     else {
+                        $this->log("remove access for module $module on $epId");
                         $ep->removeValue($module.'.access', 'modules');
                     }
                 }
@@ -316,6 +348,7 @@ class SetupJelix16 {
                     ) {
                         $modulesUrlEngine[$module] = 'index';
                         $this->entryPoints['index']->setValue($module.'.access', 2, 'modules');
+                        $this->log("set default access 2 for module $module on index");
                         $globalAccessValue = 1;
                     }
                     else { // we activate on the first entrypoint we find.
@@ -325,6 +358,7 @@ class SetupJelix16 {
                             $modulesUrlEngine[$module] = $ep;
                             $globalAccessValue = 1;
                             $this->entryPoints[$ep]->setValue($module.'.access', 2, 'modules');
+                            $this->log("set default access 2 for module $module on $ep");
                         }
                     }
                 }
@@ -350,10 +384,12 @@ class SetupJelix16 {
             }
             if (count($modulesAccess) == 0) {
                 // no entrypoint configuration for the package, let's ignore it
+                $this->log("remove access for package $packageName: no access definition");
                 continue;
             }
 
             foreach ($modulesAccess as $module=>$access) {
+                $this->log("remove access for $module");
                 $modulesUrlEngine[$module] = 0;
                 $localIni->removeValue($module.'.access', 'modules');
                 foreach ($this->entryPoints as $ep=>$ini) {
@@ -364,6 +400,7 @@ class SetupJelix16 {
 
         $this->updateUrlEngineConfig($localIni, $modulesUrlEngine);
 
+        $this->log("ends of setup of module access");
     }
 
 

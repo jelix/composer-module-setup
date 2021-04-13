@@ -234,3 +234,10 @@ configuration filename into `config-file-16`:
 }
 ```
 
+## debugging the plugin
+
+Set an environnement variable `JELIX_DEBUG_COMPOSER` to `true` or create an 
+empty file named `JELIX_DEBUG_COMPOSER` into the vendor directory.
+
+After launching Composer, you will have a file `jelix_debug.log` into
+the vendor directory.

@@ -6,6 +6,7 @@ use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
+use Composer\Package\CompletePackage;
 use Composer\Package\PackageInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Plugin\PluginEvents;
@@ -28,12 +29,29 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
     protected $vendorDir;
     protected $packages = array();
 
+    protected $debugEnabled = false;
+
+    protected $debugLogger = null;
 
     public function activate(Composer $composer, IOInterface $io)
     {
         $this->composer = $composer;
         $this->io = $io;
         $this->vendorDir = $this->composer->getConfig()->get('vendor-dir').DIRECTORY_SEPARATOR;
+        $this->debugEnabled = (getenv('JELIX_DEBUG_COMPOSER') === 'true');
+        if (!$this->debugEnabled) {
+            $this->debugEnabled = file_exists($this->vendorDir . 'JELIX_DEBUG_COMPOSER');
+        }
+        if ($this->debugEnabled) {
+            $this->debugLogger = new DebugLogger(
+                $this->vendorDir . 'jelix_debug.log'
+            );
+        }
+        else {
+            $this->debugLogger = new DummyLogger();
+        }
+
+        $this->debugLogger->log("\n***** Composer started, plugin activated *****");
     }
 
     public static function getSubscribedEvents()
@@ -69,13 +87,34 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
 
     public function onPackageInstalled(PackageEvent $event)
     {
+        /** @var CompletePackage $installedPackage */
         $installedPackage = $event->getOperation()->getPackage();
+
+        //-----
+        /*echo "\n --- packageInstalled : \n   package: ". $installedPackage->getName()."\n"; //var_export($installedPackage->getRepository());
+
+        $repo = $installedPackage->getRepository();
+        echo "   is repo localrepo of event:".($repo === $event->getLocalRepo()?'yes':'no')."\n";
+        echo "   event->localRepo : "; echo get_class($event->getLocalRepo())."\n";//var_export($event->getLocalRepo());echo "\n";
+
+        $packages = $repo->getPackages();
+        foreach ($packages as $packName => $package) {
+            echo "\n repo package: ".$packName." - ".$package->getName(). " - ". get_class($package)."\n";
+            $packRepo = $package->getRepository();
+            echo "   has repo:".($repo === $packRepo?'yes':'no')."\n";
+        }
+
+        echo "\n\n";*/
+        //-----
+
+
         //$this->io->write("=== ModuleSetup === installed package ".$installedPackage->getName()." (".$installedPackage->getType().")");
         if ($this->mustIgnorePackage($installedPackage)) {
             return;
         }
         $packagePath = $this->vendorDir.$installedPackage->getPrettyName();
         $this->packages[] = array('installed', $installedPackage->getName(), $installedPackage->getExtra(), $packagePath);
+        $this->debugLogger->log("onPackageInstalled: ".$installedPackage->getName());
     }
 
     public function onPackageUpdated(PackageEvent $event)
@@ -88,6 +127,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         }
         $packagePath = $this->vendorDir.$targetPackage->getPrettyName();
         $this->packages[] = array('updated', $targetPackage->getName(), $targetPackage->getExtra(), $packagePath);
+        $this->debugLogger->log("onPackageUpdated: ".$targetPackage->getName());
     }
 
     public function onPackageUninstall(PackageEvent $event)
@@ -98,11 +138,12 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
             return;
         }
         $this->packages[] = array('removed', $removedPackage->getName(), $removedPackage->getExtra());
-
+        $this->debugLogger->log("onPackageUninstall: ".$removedPackage->getName());
     }
 
     public function onPostInstall(\Composer\Script\Event $event)
     {
+        $this->debugLogger->log("onPostInstall");
         $jelixParameters = new JelixParameters($this->vendorDir);
         $jsonInfosFile = $this->vendorDir.'jelix_modules_infos.json';
         if (file_exists($jsonInfosFile)) {
@@ -124,6 +165,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
             }
         }
 
+        // let's add the app package
         try {
             $appPackage = $this->composer->getPackage();
             $jelixParameters->addPackage($appPackage->getName(), $appPackage->getExtra(), getcwd(), true);
@@ -137,10 +179,10 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
             $jelixParameters->getPackageParameters('jelix/jelix-essential') ||
             $jelixParameters->getPackageParameters('jelix/for-classic-package')  // deprecated
         ) {
-            $setup = new SetupJelix17($jelixParameters);
+            $setup = new SetupJelix17($jelixParameters, $this->debugLogger);
             $setup->setup();
         } else {
-            $setup = new SetupJelix16($jelixParameters);
+            $setup = new SetupJelix16($jelixParameters, $this->debugLogger);
             $setup->setup();
         }
     }
@@ -158,5 +200,15 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
     public function uninstall(Composer $composer, IOInterface $io)
     {
 
+    }
+
+    /**
+     * @return array  each item is an array containing:
+     *      - 'installed', 'updated', or 'removed'
+     *      - name of the package
+     *      - extra data of the package
+     */
+    public function getPackagesActions() {
+        return $this->packages;
     }
 }
