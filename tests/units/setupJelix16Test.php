@@ -250,7 +250,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
         $this->assertNull($ini->getValue('modulesPath'));
         $this->assertNull($ini->getValue('pluginsPath'));
         $this->assertNull($ini->getValue('test1.path', 'modules'));
-        $this->assertNull($ini->getValue('test1.access', 'modules'));
+        $this->assertEquals(2, $ini->getValue('test1.access', 'modules'));
         $this->assertNull($ini->getValue('simple_urlengine_entrypoints'));
 
         $ini = new \Jelix\ComposerPlugin\Ini\IniReader($appDir.'var/config/cmdline/script.ini.php');

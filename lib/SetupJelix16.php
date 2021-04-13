@@ -315,7 +315,7 @@ class SetupJelix16 {
                         isset($this->entryPoints['index'])
                     ) {
                         $modulesUrlEngine[$module] = 'index';
-                        $this->entryPoints[$ep]->setValue($module.'.access', 2, 'modules');
+                        $this->entryPoints['index']->setValue($module.'.access', 2, 'modules');
                         $globalAccessValue = 1;
                     }
                     else { // we activate on the first entrypoint we find.
@@ -324,6 +324,7 @@ class SetupJelix16 {
                             $ep = array_keys($epList) [0];
                             $modulesUrlEngine[$module] = $ep;
                             $globalAccessValue = 1;
+                            $this->entryPoints[$ep]->setValue($module.'.access', 2, 'modules');
                         }
                     }
                 }
