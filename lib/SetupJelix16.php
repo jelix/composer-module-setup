@@ -250,6 +250,7 @@ class SetupJelix16 {
     protected function setupModuleAccess(IniModifier $localIni)
     {
         if (!method_exists($this->parameters, 'getPackages')) {
+            // the method does not exists during update of an old version of composer-module-setup
             return;
         }
 
@@ -258,6 +259,7 @@ class SetupJelix16 {
         foreach($this->parameters->getPackages() as $packageName => $package)
         {
             if (!method_exists($package, 'isApp')) {
+                // the method does not exists during update of an old version of composer-module-setup
                 continue;
             }
             if ($package->isApp()) {
@@ -352,13 +354,9 @@ class SetupJelix16 {
 
             foreach ($modulesAccess as $module=>$access) {
                 $modulesUrlEngine[$module] = 0;
-                foreach($access->getAccess() as $ep => $accessValue) {
-                    if ($ep == '__global') {
-                        $localIni->removeValue($module.'.access', 'modules');
-                    }
-                    else if (isset($this->entryPoints[$ep])) {
-                        $this->entryPoints[$ep]->removeValue($module.'.access', 'modules');
-                    }
+                $localIni->removeValue($module.'.access', 'modules');
+                foreach ($this->entryPoints as $ep=>$ini) {
+                    $ini->removeValue($module.'.access', 'modules');
                 }
             }
         }
