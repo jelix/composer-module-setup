@@ -142,7 +142,7 @@ class JelixParameters {
                     $this->appDir = $extra['jelix']['app-dir'];
                 }
                 else {
-                    $this->appDir = realPath($packagePath.DIRECTORY_SEPARATOR.$extra['jelix']['app-dir']);
+                    $this->appDir = $this->fs->normalizePath($packagePath.DIRECTORY_SEPARATOR.$extra['jelix']['app-dir']);
                 }
                 if (!$this->appDir || !file_exists($this->appDir)) {
                     throw new ReaderException("Error in composer.json of ".$packageName.": extra/jelix/app-dir is not set or does not contain a valid path");
@@ -167,7 +167,7 @@ class JelixParameters {
                     $this->varConfigDir = $extra['jelix']['var-config-dir'];
                 }
                 else {
-                    $this->varConfigDir = realPath($packagePath . DIRECTORY_SEPARATOR . $extra['jelix']['var-config-dir']);
+                    $this->varConfigDir = $this->fs->normalizePath($packagePath . DIRECTORY_SEPARATOR . $extra['jelix']['var-config-dir']);
                 }
                 if (!$this->varConfigDir || !file_exists($this->varConfigDir)) {
                     throw new ReaderException("Error in composer.json of ".$packageName.": extra/jelix/var-config-dir is not set or does not contain a valid path");
@@ -220,10 +220,8 @@ class JelixParameters {
                 throw new ReaderException("Error in composer.json of ".$packageName.": extra/jelix/modules-dir is not an array");
             }
             foreach($extra['jelix']['modules-dir'] as $path) {
-                $path = realPath($packagePath.DIRECTORY_SEPARATOR.$path);
-                if ($path != '') {
-                    $parameters->addModulesDir($this->fs->findShortestPath($this->vendorDir, $path, true));
-                }
+                $path = $packagePath.DIRECTORY_SEPARATOR.$path;
+                $parameters->addModulesDir($this->fs->findShortestPath($this->vendorDir, $path, true));
             }
         }
 
@@ -232,10 +230,8 @@ class JelixParameters {
                 throw new ReaderException("Error in composer.json of " . $packageName . ": extra/jelix/modules is not an array");
             }
             foreach($extra['jelix']['modules'] as $path) {
-                $path = realPath($packagePath.DIRECTORY_SEPARATOR.$path);
-                if ($path != '') {
-                    $parameters->addSingleModuleDir($this->fs->findShortestPath($this->vendorDir, $path, true));
-                }
+                $path = $packagePath.DIRECTORY_SEPARATOR.$path;
+                $parameters->addSingleModuleDir($this->fs->findShortestPath($this->vendorDir, $path, true));
             }
         }
 
@@ -244,10 +240,8 @@ class JelixParameters {
                 throw new ReaderException("Error in composer.json of ".$packageName.": extra/jelix/plugins-dir is not an array");
             }
             foreach($extra['jelix']['plugins-dir'] as $path) {
-                $path = realPath($packagePath.DIRECTORY_SEPARATOR.$path);
-                if ($path != '') {
-                    $parameters->addPluginsDir($this->fs->findShortestPath($this->vendorDir, $path, true));
-                }
+                $path = $packagePath.DIRECTORY_SEPARATOR.$path;
+                $parameters->addPluginsDir($this->fs->findShortestPath($this->vendorDir, $path, true));
             }
         }
     }

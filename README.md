@@ -4,7 +4,7 @@ A plugin for Composer to declare automatically jelix modules into a jelix applic
 
 For Jelix 1.6.9 and higher.
 
-Author who provide their modules via Composer, should declare directories 
+Authors who provide their modules via Composer, should declare directories 
 containing modules or plugins. It will avoid the developer to declare them 
 into his application.init.php (Jelix 1.7) or in the configuration (Jelix 1.6.9+).
 
