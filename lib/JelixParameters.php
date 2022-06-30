@@ -61,8 +61,8 @@ class JelixParameters {
                 array(
                     'is-app'=>false,
                     'modules-dirs'=>array(),
-                     'plugins-dirs'=>array(),
-                     'modules'=>array(),
+                    'plugins-dirs'=>array(),
+                    'modules'=>array(),
                     'autoconfig-access-16'=>array(),
                     'modules-autoconfig-access-16'=>array()
                 ),
@@ -180,9 +180,6 @@ class JelixParameters {
 
             if (isset($extra['jelix']['config-file-16'])) {
                 $this->configurationFileName = $extra['jelix']['config-file-16'];
-                if ($this->configurationFileName && !file_exists($this->varConfigDir.$this->configurationFileName)) {
-                    throw new ReaderException("The configuration file name indicated into extra/jelix/config-file-16 does not exists into the var/config/ directory of the application");
-                }
             }
 
             if (isset($extra['jelix']['modules-autoconfig-access-16'])) {
