@@ -1,5 +1,22 @@
 
+Version 1.0.6
+=============
 
+- Fix: do not check the file declared into `config-file-16`, as it may not exists for Jelix 1.7
+
+Version 1.0.5
+=============
+
+- Fix path into jelix_modules_infos.json, when there are some file links
+- Improve message logs
+
+Version 1.0.4
+=============
+
+- New feature: possibility to have a log file of what did the plugin.
+  To generate logs, set the environment variable `JELIX_DEBUG_COMPOSER=true`
+- Fix access setup on an undefined default entrypoint
+- Fix: when removing a module, some infos still remained into jelix app config
 
 Version 1.0.3
 =============
