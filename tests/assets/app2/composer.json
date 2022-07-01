@@ -1,0 +1,38 @@
+{
+  "name": "jelix/test-composer-setup",
+  "type": "application",
+  "description": "",
+  "license": "MIT",
+  "repositories": [
+    {
+      "type": "path",
+      "url": "../../../",
+      "options": {
+        "symlink": true
+      }
+    }
+  ],
+  "require": {
+    "jelix/composer-module-setup": "@dev",
+    "jelix/file-utilities": "1.8.*",
+    "jelix/helloworld-module": "1.0.*"
+  },
+  "extra" : {
+    "jelix": {
+      "modules-dir" : [
+        "modules/"
+      ],
+      "plugins-dir" : [
+        "plugins/"
+      ],
+      "modules-autoconfig-access-16" : {
+        "jelix/helloworld-module" : {
+          "helloworld": {
+            "index" : 2
+          }
+        }
+      }
+    }
+  },
+  "minimum-stability": "stable"
+}

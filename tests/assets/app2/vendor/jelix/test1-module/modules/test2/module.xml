@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="http://jelix.org/ns/module/1.0">
+    <info id="test2@tests" name="test2">
+        <version date="2021-03-18">1.0</version>
+        <label lang="en_US">test2</label>
+        <description lang="en_US"/>
+    </info>
+    <dependencies>
+        <jelix minversion="1.6.29" maxversion="1.7.*"/>
+    </dependencies>
+</module>

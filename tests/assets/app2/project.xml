@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://jelix.org/ns/project/1.0">
+    <info id="tests@tests" name="tests">
+        <version date="2021-03-17">0.1</version>
+        <label lang="en_US">Tests</label>
+        <description lang="en_US"/>
+    </info>
+</project>

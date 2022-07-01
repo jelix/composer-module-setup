@@ -1,0 +1,31 @@
+{
+    "version": 1,
+    "target-jelix-version": "1.7",
+    "packages": {
+        "jelix\/app2-tests": {
+            "modules-dirs": [],
+            "plugins-dirs": [],
+            "modules": [],
+            "autoconfig-access-16": [],
+            "modules-autoconfig-access-16": []
+        },
+        "jelix\/test1-module": {
+            "modules-dirs": [
+                "jelix\/test1-module\/modules"
+            ],
+            "plugins-dirs": [],
+            "modules": [],
+            "autoconfig-access-16": {
+                "jelix\/app2-tests": {
+                    "test1": {
+                        "__global": 1,
+                        "index": 2,
+                        "admin": 1
+                    }
+                }
+            },
+            "modules-autoconfig-access-16": []
+        }
+    },
+    "0": ""
+}

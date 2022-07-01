@@ -37,6 +37,8 @@ class JelixParameters {
 
     protected $autoconfig16 = array();
 
+    protected $jelixTarget = '';
+
     /**
      * name of the configuration file that will be modified to declare
      * module paths. Only for Jelix 1.6
@@ -53,9 +55,15 @@ class JelixParameters {
     function loadFromFile($filepath)
     {
         $content = json_decode(file_get_contents($filepath), true);
+
         if (!isset($content['packages'])) {
             return;
         }
+
+        if (isset($content['target-jelix-version'])) {
+            $this->jelixTarget = $content['target-jelix-version'];
+        }
+
         foreach($content['packages'] as $package => $infos) {
             $content = array_merge_recursive(
                 array(
@@ -80,7 +88,12 @@ class JelixParameters {
 
     function saveToFile($filepath)
     {
-        $content = array( 'version'=>1, 'packages'=>array());
+        $content = array(
+            'version'=>1,
+            'target-jelix-version' => $this->jelixTarget,
+            'packages'=>array(),
+            ''
+        );
         foreach($this->packagesInfos as $package => $parameters) {
             $content['packages'][$package] = array(
                 'modules-dirs'=>$parameters->getModulesDirs(),
@@ -178,28 +191,37 @@ class JelixParameters {
                 throw new ReaderException("The var/config directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/var-config-dir parameter");
             }
 
-            if (isset($extra['jelix']['config-file-16'])) {
-                $this->configurationFileName = $extra['jelix']['config-file-16'];
+
+            if (file_exists($this->appDir.'app/system/mainconfig.ini.php')) {
+                $this->jelixTarget = '1.7';
             }
 
-            if (isset($extra['jelix']['modules-autoconfig-access-16'])) {
-                $modulesAccess = $extra['jelix']['modules-autoconfig-access-16'];
-                if (is_array($modulesAccess)) {
-                    $cleanedModulesAccess = array();
-                    foreach($extra['jelix']['modules-autoconfig-access-16'] as $package => $moduleAccess) {
-                        if (!is_string($package) || !is_array($moduleAccess)) {
-                            continue;
-                        }
-                        foreach($moduleAccess as $module =>$access) {
-                            if (is_array($access)) {
-                                if (!array_key_exists($package, $cleanedModulesAccess)) {
-                                    $cleanedModulesAccess[$package] = array();
+            if (!file_exists($this->appDir.'app/system/mainconfig.ini.php') && file_exists($this->varConfigDir.'mainconfig.ini.php')) {
+                $this->jelixTarget = '1.6';
+
+                if (isset($extra['jelix']['config-file-16'])) {
+                    $this->configurationFileName = $extra['jelix']['config-file-16'];
+                }
+
+                if (isset($extra['jelix']['modules-autoconfig-access-16'])) {
+                    $modulesAccess = $extra['jelix']['modules-autoconfig-access-16'];
+                    if (is_array($modulesAccess)) {
+                        $cleanedModulesAccess = array();
+                        foreach($extra['jelix']['modules-autoconfig-access-16'] as $package => $moduleAccess) {
+                            if (!is_string($package) || !is_array($moduleAccess)) {
+                                continue;
+                            }
+                            foreach($moduleAccess as $module =>$access) {
+                                if (is_array($access)) {
+                                    if (!array_key_exists($package, $cleanedModulesAccess)) {
+                                        $cleanedModulesAccess[$package] = array();
+                                    }
+                                    $cleanedModulesAccess[$package][$module] = $access;
                                 }
-                                $cleanedModulesAccess[$package][$module] = $access;
                             }
                         }
+                        $parameters->setPackageModulesAccess($cleanedModulesAccess);
                     }
-                    $parameters->setPackageModulesAccess($cleanedModulesAccess);
                 }
             }
 
@@ -243,8 +265,15 @@ class JelixParameters {
         }
     }
 
-
-    protected function readAutoconfigAccess(JelixPackageParameters $parameters, $extra) {
+    /**
+     * read informations from the composer.json of a module package
+     *
+     * @param JelixPackageParameters $parameters
+     * @param $extra
+     * @return void
+     */
+    protected function readAutoconfigAccess(JelixPackageParameters $parameters, $extra)
+    {
         if (isset($extra['jelix']['autoconfig-access-16'])) {
             $modulesAccess = $extra['jelix']['autoconfig-access-16'];
             if (is_array($modulesAccess)) {
@@ -338,5 +367,28 @@ class JelixParameters {
             $allModules = array_merge($allModules, $parameters->getSingleModuleDirs());
         }
         return $allModules;
+    }
+
+    function isJelix16()
+    {
+        if ($this->jelixTarget == '') {
+            if ($this->getPackageParameters('jelix/jelix') ||
+                $this->getPackageParameters('jelix/jelix-essential') ||
+                $this->getPackageParameters('jelix/for-classic-package')  // deprecated
+            ) {
+                return false;
+            }
+
+            if (file_exists($this->appDir.'app/system/mainconfig.ini.php')) {
+                $this->jelixTarget = '1.7';
+                return false;
+            }
+
+            return true;
+        }
+        else if ($this->jelixTarget == '1.6') {
+            return true;
+        }
+        return false;
     }
 }
