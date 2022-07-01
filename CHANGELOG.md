@@ -1,3 +1,12 @@
+Version 1.0.7
+=============
+
+Fix: do not use SetupJelix16, when the plugin is used in a secondary composer.json
+
+If the composer.json is not the main application composer.json, the plugin should verify on which Jelix version is
+based the application, with a better method than checking jelix packages, as into
+a secondary composer.json don't load the jelix packages.
+
 
 Version 1.0.6
 =============
