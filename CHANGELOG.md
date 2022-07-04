@@ -1,3 +1,8 @@
+Version 1.0.9
+=============
+
+Fix previous version: it did not use the new internal api `isJelix16()` :-/
+
 Version 1.0.8
 =============
 

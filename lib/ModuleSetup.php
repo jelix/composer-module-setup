@@ -175,14 +175,11 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
 
         $jelixParameters->saveToFile($jsonInfosFile);
 
-        if ($jelixParameters->getPackageParameters('jelix/jelix') ||
-            $jelixParameters->getPackageParameters('jelix/jelix-essential') ||
-            $jelixParameters->getPackageParameters('jelix/for-classic-package')  // deprecated
-        ) {
-            $setup = new SetupJelix17($jelixParameters, $this->debugLogger);
+        if ($jelixParameters->isJelix16()) {
+            $setup = new SetupJelix16($jelixParameters, $this->debugLogger);
             $setup->setup();
         } else {
-            $setup = new SetupJelix16($jelixParameters, $this->debugLogger);
+            $setup = new SetupJelix17($jelixParameters, $this->debugLogger);
             $setup->setup();
         }
     }
