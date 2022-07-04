@@ -78,6 +78,52 @@ class jelix16ParametersTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($p->isJelix16());
     }
 
+   function testAddAppPackageWithTargetJelixVersion()
+    {
+        $appDir = realpath(__DIR__.'/../tmp/app1/').'/';
+
+        $vendorDir = $appDir.'vendor/';
+        $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
+
+        $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
+
+        $p->addPackage('jelix/app1-tests', array(
+            "jelix" => array (
+                "app-dir" => "./",
+                "var-config-dir" => "./var/config/",
+                "modules-dir" => [
+                    'modules2/'
+                ],
+                "target-jelix-version" => "1.7"
+            )
+        ), $appDir, true);
+
+        $this->assertEquals($appDir, $p->getAppDir());
+        $this->assertEquals($appDir.'var/config/', $p->getVarConfigDir());
+        $this->assertEquals($vendorDir, $p->getVendorDir());
+        $this->assertEquals('', $p->getConfigFileName());
+
+        $this->assertEquals(array('../modules2'), $p->getAllModulesDirs());
+        $this->assertEquals(array(), $p->getAllPluginsDirs());
+        $this->assertEquals(array(), $p->getAllSingleModuleDirs());
+
+        $this->assertEquals(1, count($p->getPackages()));
+
+        $this->assertEquals(array(), $p->getRemovedPackages());
+        $packages = $p->getPackages();
+        $appPackage = $packages['jelix/app1-tests'];
+        $this->assertEquals($appPackage, $p->getApplicationPackage());
+
+        $this->assertTrue($appPackage->isApp());
+        $this->assertEquals('jelix/app1-tests', $appPackage->getPackageName());
+        $this->assertEquals(array(), $appPackage->getPackageModulesAccess());
+        $this->assertEquals(array(), $appPackage->getAppModulesAccess());
+        $this->assertEquals(array('../modules2'), $appPackage->getModulesDirs());
+        $this->assertEquals(array(), $appPackage->getPluginsDirs());
+        $this->assertEquals(array(), $appPackage->getSingleModuleDirs());
+        $this->assertFalse($p->isJelix16());
+    }
+
     function testAddPackage()
     {
         $appDir = realpath(__DIR__.'/../tmp/app1/').'/';

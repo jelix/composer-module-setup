@@ -191,14 +191,17 @@ class JelixParameters {
                 throw new ReaderException("The var/config directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/var-config-dir parameter");
             }
 
-
-            if (file_exists($this->appDir.'app/system/mainconfig.ini.php')) {
+            if (isset($extra['jelix']['target-jelix-version']) && preg_match("/^(\\d+\\.\\d+)/", $extra['jelix']['target-jelix-version'], $v)) {
+                $this->jelixTarget = $v[1];
+            }
+            else if (file_exists($this->appDir.'app/system/mainconfig.ini.php')) {
                 $this->jelixTarget = '1.7';
             }
-
-            if (!file_exists($this->appDir.'app/system/mainconfig.ini.php') && file_exists($this->varConfigDir.'mainconfig.ini.php')) {
+            else if (!file_exists($this->appDir.'app/system/mainconfig.ini.php') && file_exists($this->varConfigDir.'mainconfig.ini.php')) {
                 $this->jelixTarget = '1.6';
+            }
 
+            if ($this->jelixTarget == '1.6') {
                 if (isset($extra['jelix']['config-file-16'])) {
                     $this->configurationFileName = $extra['jelix']['config-file-16'];
                 }
