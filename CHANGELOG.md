@@ -1,3 +1,12 @@
+Version 1.0.8
+=============
+
+Possibility to force the target jelix version for migration
+
+When migrating an app from Jelix 1.6 to Jelix 1.7, the application is still
+with the files of Jelix 1.6. So the setup is not done with Jelix 1.7.
+Specifying the target allow to launch the setup for the right Jelix version.
+
 Version 1.0.7
 =============
 
