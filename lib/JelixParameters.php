@@ -139,6 +139,9 @@ class JelixParameters {
 
         if (!isset($extra['jelix'])) {
             $this->appDir = $packagePath;
+            $this->appDir = rtrim($this->appDir, "/") . "/";
+            $this->varConfigDir = $this->appDir . 'var/config/';
+
             return;
         }
 
@@ -160,9 +163,6 @@ class JelixParameters {
 
         } else {
             $this->appDir = $packagePath;
-            if (!file_exists($this->appDir . '/project.xml')) {
-                throw new ReaderException("The directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/app-dir parameter");
-            }
         }
         $this->appDir = rtrim($this->appDir, "/") . "/";
 
@@ -178,42 +178,38 @@ class JelixParameters {
                 throw new ReaderException("Error in composer.json of " . $packageName . ": extra/jelix/var-config-dir is not set or does not contain a valid path");
             }
             $this->varConfigDir = rtrim($this->varConfigDir, "/") . "/";
-        } else if (!file_exists($this->varConfigDir)) {
-            throw new ReaderException("The var/config directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/var-config-dir parameter");
         }
 
         if (isset($extra['jelix']['target-jelix-version']) && preg_match("/^(\\d+\\.\\d+)/", $extra['jelix']['target-jelix-version'], $v)) {
             $this->jelixTarget = $v[1];
         } else if (file_exists($this->appDir . 'app/system/mainconfig.ini.php')) {
             $this->jelixTarget = '1.7';
-        } else if (!file_exists($this->appDir . 'app/system/mainconfig.ini.php') && file_exists($this->varConfigDir . 'mainconfig.ini.php')) {
+        } else if (file_exists($this->varConfigDir . 'mainconfig.ini.php')) {
             $this->jelixTarget = '1.6';
         }
 
-        if ($this->jelixTarget == '1.6') {
-            if (isset($extra['jelix']['config-file-16'])) {
-                $this->configurationFileName = $extra['jelix']['config-file-16'];
-            }
+        if (isset($extra['jelix']['config-file-16'])) {
+            $this->configurationFileName = $extra['jelix']['config-file-16'];
+        }
 
-            if (isset($extra['jelix']['modules-autoconfig-access-16'])) {
-                $modulesAccess = $extra['jelix']['modules-autoconfig-access-16'];
-                if (is_array($modulesAccess)) {
-                    $cleanedModulesAccess = array();
-                    foreach ($extra['jelix']['modules-autoconfig-access-16'] as $package => $moduleAccess) {
-                        if (!is_string($package) || !is_array($moduleAccess)) {
-                            continue;
-                        }
-                        foreach ($moduleAccess as $module => $access) {
-                            if (is_array($access)) {
-                                if (!array_key_exists($package, $cleanedModulesAccess)) {
-                                    $cleanedModulesAccess[$package] = array();
-                                }
-                                $cleanedModulesAccess[$package][$module] = $access;
+        if (isset($extra['jelix']['modules-autoconfig-access-16'])) {
+            $modulesAccess = $extra['jelix']['modules-autoconfig-access-16'];
+            if (is_array($modulesAccess)) {
+                $cleanedModulesAccess = array();
+                foreach ($extra['jelix']['modules-autoconfig-access-16'] as $package => $moduleAccess) {
+                    if (!is_string($package) || !is_array($moduleAccess)) {
+                        continue;
+                    }
+                    foreach ($moduleAccess as $module => $access) {
+                        if (is_array($access)) {
+                            if (!array_key_exists($package, $cleanedModulesAccess)) {
+                                $cleanedModulesAccess[$package] = array();
                             }
+                            $cleanedModulesAccess[$package][$module] = $access;
                         }
                     }
-                    $parameters->setPackageModulesAccess($cleanedModulesAccess);
                 }
+                $parameters->setPackageModulesAccess($cleanedModulesAccess);
             }
         }
 
@@ -401,7 +397,10 @@ class JelixParameters {
                 return false;
             }
 
-            return true;
+            if (file_exists($this->varConfigDir . 'mainconfig.ini.php')) {
+                $this->jelixTarget = '1.6';
+                return true;
+            }
         }
         else if ($this->jelixTarget == '1.6') {
             return true;

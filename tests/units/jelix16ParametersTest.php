@@ -31,7 +31,7 @@ class jelix16ParametersTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array(), $p->getPackages());
         $this->assertEquals(null, $p->getApplicationPackage());
         $this->assertEquals(array(), $p->getRemovedPackages());
-        $this->assertTrue($p->isJelix16());
+        $this->assertFalse($p->isJelix16());
     }
 
     function testAddAppPackage()

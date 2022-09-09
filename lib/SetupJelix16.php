@@ -83,7 +83,9 @@ class SetupJelix16 {
         $this->readProjectXml();
         $ini = $this->loadLocalConfigFile();
         $configDir = $this->parameters->getVarConfigDir();
-
+        if (!file_exists($configDir)) {
+            throw new ReaderException("The var/config directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/var-config-dir parameter");
+        }
         $vendorPath = $this->getFinalPath('./');
 
         // retrieve the current modulesPath value
@@ -262,6 +264,9 @@ class SetupJelix16 {
         $configDir = $this->parameters->getVarConfigDir();
 
         $this->entryPoints = array();
+        if (!file_exists($appDir . '/project.xml')) {
+            throw new \Exception("The directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/app-dir parameter");
+        }
         $xml = simplexml_load_file($appDir.'/project.xml');
         // read all entry points data
         foreach ($xml->entrypoints->entry as $entrypoint) {
