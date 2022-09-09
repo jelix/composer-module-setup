@@ -1,3 +1,8 @@
+Version 1.0.10
+==============
+
+Fix an error when updating the packages, whereas there is no application yet.
+
 Version 1.0.9
 =============
 
