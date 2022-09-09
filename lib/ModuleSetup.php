@@ -158,7 +158,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
             else {
                 try {
                     list($action, $name, $extra, $path) = $packageInfo;
-                    $jelixParameters->addPackage($name, $extra, $path, false);
+                    $jelixParameters->addPackage($name, $extra, $path);
                 } catch (ReaderException $e) {
                     $this->io->writeError($e->getMessage());
                 }
@@ -168,7 +168,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         // let's add the app package
         try {
             $appPackage = $this->composer->getPackage();
-            $jelixParameters->addPackage($appPackage->getName(), $appPackage->getExtra(), getcwd(), true);
+            $jelixParameters->addApplicationPackage($appPackage->getName(), $appPackage->getExtra(), getcwd());
         } catch (ReaderException $e) {
             $this->io->writeError($e->getMessage());
         }

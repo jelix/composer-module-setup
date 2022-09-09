@@ -126,116 +126,130 @@ class JelixParameters {
      * @param string $packageName package composer name
      * @param array $extra content of the extra section of the composer.json of the package
      * @param string $packagePath path to the package
-     * @param bool $appPackage indicate if the package is a package loaded by composer (false)
-     *             or if it is the application itself (true)
      *
      */
-    function addPackage($packageName, $extra, $packagePath, $appPackage=false)
+    function addApplicationPackage($packageName, $extra, $packagePath)
     {
-        $parameters = new JelixPackageParameters($packageName, $appPackage);
+        $parameters = new JelixPackageParameters($packageName, true);
         $this->packagesInfos[$packageName] = $parameters;
 
-        if(isset($this->removedPackagesInfos[$packageName]))
-        {
+        if (isset($this->removedPackagesInfos[$packageName])) {
             unset($this->removedPackagesInfos[$packageName]);
         }
 
         if (!isset($extra['jelix'])) {
-            if ($appPackage) {
-                $this->appDir = $packagePath;
-            }
+            $this->appDir = $packagePath;
             return;
         }
 
-        if ($appPackage) {
-            // read informations from the composer.json of the application
+        // This is the package of the application.
+        // Process information from the composer.json of the application
 
-            if (isset($extra['jelix']['app-dir'])) {
-                if ($this->fs->isAbsolutePath($extra['jelix']['app-dir'])) {
-                    $this->appDir = $extra['jelix']['app-dir'];
-                }
-                else {
-                    $this->appDir = $this->fs->normalizePath($packagePath.DIRECTORY_SEPARATOR.$extra['jelix']['app-dir']);
-                }
-                if (!$this->appDir || !file_exists($this->appDir)) {
-                    throw new ReaderException("Error in composer.json of ".$packageName.": extra/jelix/app-dir is not set or does not contain a valid path");
-                }
-                if (!file_exists($this->appDir.'/project.xml')) {
-                    throw new ReaderException("Error in composer.json of ".$packageName.": extra/jelix/app-dir is not a path to a Jelix application");
-                }
-
+        if (isset($extra['jelix']['app-dir'])) {
+            if ($this->fs->isAbsolutePath($extra['jelix']['app-dir'])) {
+                $this->appDir = $extra['jelix']['app-dir'];
+            } else {
+                $this->appDir = $this->fs->normalizePath($packagePath . DIRECTORY_SEPARATOR . $extra['jelix']['app-dir']);
             }
-            else {
-                $this->appDir = $packagePath;
-                if (!file_exists($this->appDir.'/project.xml')) {
-                    throw new ReaderException("The directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/app-dir parameter");
-                }
+            if (!$this->appDir || !file_exists($this->appDir)) {
+                throw new ReaderException("Error in composer.json of " . $packageName . ": extra/jelix/app-dir is not set or does not contain a valid path");
             }
-            $this->appDir = rtrim($this->appDir, "/")."/";
-
-            $this->varConfigDir = $this->appDir.'var/config/';
-
-            if (isset($extra['jelix']['var-config-dir'])) {
-                if ($this->fs->isAbsolutePath($extra['jelix']['var-config-dir'])) {
-                    $this->varConfigDir = $extra['jelix']['var-config-dir'];
-                }
-                else {
-                    $this->varConfigDir = $this->fs->normalizePath($packagePath . DIRECTORY_SEPARATOR . $extra['jelix']['var-config-dir']);
-                }
-                if (!$this->varConfigDir || !file_exists($this->varConfigDir)) {
-                    throw new ReaderException("Error in composer.json of ".$packageName.": extra/jelix/var-config-dir is not set or does not contain a valid path");
-                }
-                $this->varConfigDir = rtrim($this->varConfigDir, "/")."/";
-            }
-            else if (!file_exists($this->varConfigDir)) {
-                throw new ReaderException("The var/config directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/var-config-dir parameter");
+            if (!file_exists($this->appDir . '/project.xml')) {
+                throw new ReaderException("Error in composer.json of " . $packageName . ": extra/jelix/app-dir is not a path to a Jelix application");
             }
 
-            if (isset($extra['jelix']['target-jelix-version']) && preg_match("/^(\\d+\\.\\d+)/", $extra['jelix']['target-jelix-version'], $v)) {
-                $this->jelixTarget = $v[1];
+        } else {
+            $this->appDir = $packagePath;
+            if (!file_exists($this->appDir . '/project.xml')) {
+                throw new ReaderException("The directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/app-dir parameter");
             }
-            else if (file_exists($this->appDir.'app/system/mainconfig.ini.php')) {
-                $this->jelixTarget = '1.7';
+        }
+        $this->appDir = rtrim($this->appDir, "/") . "/";
+
+        $this->varConfigDir = $this->appDir . 'var/config/';
+
+        if (isset($extra['jelix']['var-config-dir'])) {
+            if ($this->fs->isAbsolutePath($extra['jelix']['var-config-dir'])) {
+                $this->varConfigDir = $extra['jelix']['var-config-dir'];
+            } else {
+                $this->varConfigDir = $this->fs->normalizePath($packagePath . DIRECTORY_SEPARATOR . $extra['jelix']['var-config-dir']);
             }
-            else if (!file_exists($this->appDir.'app/system/mainconfig.ini.php') && file_exists($this->varConfigDir.'mainconfig.ini.php')) {
-                $this->jelixTarget = '1.6';
+            if (!$this->varConfigDir || !file_exists($this->varConfigDir)) {
+                throw new ReaderException("Error in composer.json of " . $packageName . ": extra/jelix/var-config-dir is not set or does not contain a valid path");
+            }
+            $this->varConfigDir = rtrim($this->varConfigDir, "/") . "/";
+        } else if (!file_exists($this->varConfigDir)) {
+            throw new ReaderException("The var/config directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/var-config-dir parameter");
+        }
+
+        if (isset($extra['jelix']['target-jelix-version']) && preg_match("/^(\\d+\\.\\d+)/", $extra['jelix']['target-jelix-version'], $v)) {
+            $this->jelixTarget = $v[1];
+        } else if (file_exists($this->appDir . 'app/system/mainconfig.ini.php')) {
+            $this->jelixTarget = '1.7';
+        } else if (!file_exists($this->appDir . 'app/system/mainconfig.ini.php') && file_exists($this->varConfigDir . 'mainconfig.ini.php')) {
+            $this->jelixTarget = '1.6';
+        }
+
+        if ($this->jelixTarget == '1.6') {
+            if (isset($extra['jelix']['config-file-16'])) {
+                $this->configurationFileName = $extra['jelix']['config-file-16'];
             }
 
-            if ($this->jelixTarget == '1.6') {
-                if (isset($extra['jelix']['config-file-16'])) {
-                    $this->configurationFileName = $extra['jelix']['config-file-16'];
-                }
-
-                if (isset($extra['jelix']['modules-autoconfig-access-16'])) {
-                    $modulesAccess = $extra['jelix']['modules-autoconfig-access-16'];
-                    if (is_array($modulesAccess)) {
-                        $cleanedModulesAccess = array();
-                        foreach($extra['jelix']['modules-autoconfig-access-16'] as $package => $moduleAccess) {
-                            if (!is_string($package) || !is_array($moduleAccess)) {
-                                continue;
-                            }
-                            foreach($moduleAccess as $module =>$access) {
-                                if (is_array($access)) {
-                                    if (!array_key_exists($package, $cleanedModulesAccess)) {
-                                        $cleanedModulesAccess[$package] = array();
-                                    }
-                                    $cleanedModulesAccess[$package][$module] = $access;
+            if (isset($extra['jelix']['modules-autoconfig-access-16'])) {
+                $modulesAccess = $extra['jelix']['modules-autoconfig-access-16'];
+                if (is_array($modulesAccess)) {
+                    $cleanedModulesAccess = array();
+                    foreach ($extra['jelix']['modules-autoconfig-access-16'] as $package => $moduleAccess) {
+                        if (!is_string($package) || !is_array($moduleAccess)) {
+                            continue;
+                        }
+                        foreach ($moduleAccess as $module => $access) {
+                            if (is_array($access)) {
+                                if (!array_key_exists($package, $cleanedModulesAccess)) {
+                                    $cleanedModulesAccess[$package] = array();
                                 }
+                                $cleanedModulesAccess[$package][$module] = $access;
                             }
                         }
-                        $parameters->setPackageModulesAccess($cleanedModulesAccess);
                     }
+                    $parameters->setPackageModulesAccess($cleanedModulesAccess);
                 }
             }
-
-        }
-        else {
-            // read informations from the composer.json of a module package
-
-            $this->readAutoconfigAccess($parameters, $extra);
         }
 
-        // read informations that can be in any composer.json
+        // read information that can be in any composer.json
+        $this->readModuleDirs($packageName, $packagePath, $parameters, $extra);
+    }
+
+
+    /**
+     * @param string $packageName package composer name
+     * @param array $extra content of the extra section of the composer.json of the package
+     * @param string $packagePath path to the package
+     */
+    function addPackage($packageName, $extra, $packagePath)
+    {
+        $parameters = new JelixPackageParameters($packageName, false);
+        $this->packagesInfos[$packageName] = $parameters;
+
+        if (isset($this->removedPackagesInfos[$packageName])) {
+            unset($this->removedPackagesInfos[$packageName]);
+        }
+
+        if (!isset($extra['jelix'])) {
+            return;
+        }
+
+        // read information from the composer.json of a module package
+        $this->readAutoconfigAccess($parameters, $extra);
+
+        // read information that can be in any composer.json
+        $this->readModuleDirs($packageName, $packagePath, $parameters, $extra);
+    }
+
+
+    protected function readModuleDirs($packageName, $packagePath, JelixPackageParameters $parameters, &$extra)
+    {
 
         if (isset($extra['jelix']['modules-dir'])) {
             if (!is_array($extra['jelix']['modules-dir'])) {

@@ -42,7 +42,7 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
 
         $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
 
-        $p->addPackage('jelix/app2-tests', array(
+        $p->addApplicationPackage('jelix/app2-tests', array(
             "jelix" => array (
                 "app-dir" => "./",
                 "var-config-dir" => "./var/config/",
@@ -50,7 +50,7 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
                     'modules2/'
                 ]
             )
-        ), $appDir, true);
+        ), $appDir);
 
         $this->assertEquals($appDir, $p->getAppDir());
         $this->assertEquals($appDir.'var/config/', $p->getVarConfigDir());
@@ -86,11 +86,11 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
 
         $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
 
-        $p->addPackage('jelix/app2-tests', array(
+        $p->addApplicationPackage('jelix/app2-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
             )
-        ), $appDir, true);
+        ), $appDir);
 
 
         $p->addPackage(
@@ -110,7 +110,7 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 )
-            ), $vendorDir.'jelix/test1-module/', false);
+            ), $vendorDir.'jelix/test1-module/');
 
 
         $this->assertEquals($appDir, $p->getAppDir());

@@ -31,11 +31,11 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
 
         $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
 
-        $p->addPackage('jelix/app1-tests', array(
+        $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
             )
-        ), $appDir, true);
+        ), $appDir);
 
 
         $p->addPackage(
@@ -55,7 +55,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 )
-        ), $vendorDir.'jelix/test1-module/', false);
+        ), $vendorDir.'jelix/test1-module/');
 
         $setup = new \Jelix\ComposerPlugin\SetupJelix16($p);
         $setup->setup();
@@ -111,11 +111,11 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
 
         $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
 
-        $p->addPackage('jelix/app1-tests', array(
+        $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
             )
-        ), $appDir, true);
+        ), $appDir);
 
 
         $p->addPackage(
@@ -135,7 +135,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 )
-        ), $vendorDir.'jelix/test1-module/', false);
+        ), $vendorDir.'jelix/test1-module/');
 
         $setup = new \Jelix\ComposerPlugin\SetupJelix16($p);
         $setup->setup();
@@ -191,11 +191,11 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
 
         $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
 
-        $p->addPackage('jelix/app1-tests', array(
+        $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
             )
-        ), $appDir, true);
+        ), $appDir);
 
 
         $p->addPackage(
@@ -214,7 +214,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 )
-        ), $vendorDir.'jelix/test1-module/', false);
+        ), $vendorDir.'jelix/test1-module/');
 
         $setup = new \Jelix\ComposerPlugin\SetupJelix16($p);
         $setup->setup();
@@ -271,11 +271,11 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
 
         $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
 
-        $p->addPackage('jelix/app1-tests', array(
+        $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
             )
-        ), $appDir, true);
+        ), $appDir);
 
 
         $p->addPackage(
@@ -294,7 +294,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 )
-            ), $vendorDir.'jelix/test1-module/', false);
+            ), $vendorDir.'jelix/test1-module/');
 
         $setup = new \Jelix\ComposerPlugin\SetupJelix16($p);
         $setup->setup();
@@ -350,11 +350,11 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
 
         $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
 
-        $p->addPackage('jelix/app1-tests', array(
+        $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
             )
-        ), $appDir, true);
+        ), $appDir);
 
 
         $p->addPackage(
@@ -372,7 +372,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 )
-            ), $vendorDir.'jelix/test1-module/', false);
+            ), $vendorDir.'jelix/test1-module/');
 
         $setup = new \Jelix\ComposerPlugin\SetupJelix16($p);
         $setup->setup();
@@ -428,11 +428,11 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
 
         $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
 
-        $p->addPackage('jelix/app1-tests', array(
+        $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
             )
-        ), $appDir, true);
+        ), $appDir);
 
 
         $p->addPackage(
@@ -450,7 +450,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 )
-            ), $vendorDir.'jelix/test1-module/', false);
+            ), $vendorDir.'jelix/test1-module/');
 
         $setup = new \Jelix\ComposerPlugin\SetupJelix16($p);
         $setup->setup();
@@ -506,11 +506,11 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
 
         $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
 
-        $p->addPackage('jelix/app1-tests', array(
+        $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
             )
-        ), $appDir, true);
+        ), $appDir);
 
         $p->addPackage(
             'jelix/test1-module',
@@ -532,7 +532,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 )
-            ), $vendorDir.'jelix/test1-module/', false);
+            ), $vendorDir.'jelix/test1-module/');
 
         $setup = new \Jelix\ComposerPlugin\SetupJelix16($p);
         $setup->setup();
@@ -595,11 +595,11 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
 
         $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
 
-        $p->addPackage('jelix/app1-tests', array(
+        $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
             )
-        ), $appDir, true);
+        ), $appDir);
 
 
         $p->addPackage(
@@ -619,7 +619,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 )
-            ), $vendorDir.'jelix/test1-module/', false);
+            ), $vendorDir.'jelix/test1-module/');
 
         $setup = new \Jelix\ComposerPlugin\SetupJelix16($p);
         $setup->setup();
@@ -676,11 +676,11 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
 
         $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
 
-        $p->addPackage('jelix/app1-tests', array(
+        $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
             )
-        ), $appDir, true);
+        ), $appDir);
 
 
         $p->addPackage(
@@ -700,7 +700,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 )
-            ), $vendorDir.'jelix/test1-module/', false);
+            ), $vendorDir.'jelix/test1-module/');
 
         $setup = new \Jelix\ComposerPlugin\SetupJelix16($p);
         $setup->setup();
@@ -751,11 +751,11 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
         // now let's simulate an update with a different entrypoint configuration
         $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
         $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
-        $p->addPackage('jelix/app1-tests', array(
+        $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
             )
-        ), $appDir, true);
+        ), $appDir);
         $p->addPackage(
             'jelix/test1-module',
             array(
@@ -772,7 +772,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 )
-            ), $vendorDir.'jelix/test1-module/', false);
+            ), $vendorDir.'jelix/test1-module/');
 
         $setup = new \Jelix\ComposerPlugin\SetupJelix16($p);
         $setup->setup();
@@ -831,11 +831,11 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
 
         $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
 
-        $p->addPackage('jelix/app1-tests', array(
+        $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
             )
-        ), $appDir, true);
+        ), $appDir);
 
 
         $p->addPackage(
@@ -855,7 +855,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 )
-            ), $vendorDir.'jelix/test1-module/', false);
+            ), $vendorDir.'jelix/test1-module/');
 
         $setup = new \Jelix\ComposerPlugin\SetupJelix16($p);
         $setup->setup();
@@ -907,11 +907,11 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
 
         $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
         $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
-        $p->addPackage('jelix/app1-tests', array(
+        $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
             )
-        ), $appDir, true);
+        ), $appDir);
         $p->removePackage(
             'jelix/test1-module',
             array(
@@ -987,11 +987,11 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
 
         $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
 
-        $p->addPackage('jelix/app1-tests', array(
+        $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
             )
-        ), $appDir, true);
+        ), $appDir);
 
 
         $p->addPackage(
@@ -1009,7 +1009,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 )
-            ), $vendorDir.'jelix/test1-module/', false);
+            ), $vendorDir.'jelix/test1-module/');
 
         $setup = new \Jelix\ComposerPlugin\SetupJelix16($p);
         $setup->setup();
@@ -1061,11 +1061,11 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
 
         $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
         $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
-        $p->addPackage('jelix/app1-tests', array(
+        $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
             )
-        ), $appDir, true);
+        ), $appDir);
         $p->removePackage(
             'jelix/test1-module',
             array(
