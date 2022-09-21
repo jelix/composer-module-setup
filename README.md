@@ -10,12 +10,18 @@ into his application.init.php (Jelix 1.7) or in the configuration (Jelix 1.6.9+)
 
 ## installation
 
-In the composer.json of your application, declare the plugin
+In the composer.json of your application, declare the plugin and authorize
+the plugin to be executed by Composer.
 
 ```json
 {
     "require": {
         "jelix/composer-module-setup": "^1.0.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "jelix/composer-module-setup": true
+        }
     }
 }
 ```
@@ -25,7 +31,7 @@ In the composer.json of your application, declare the plugin
 Author who provide their modules via Composer, should declare directories containing modules
 or plugins. It will avoid the developer to declare them into his application.init.php.
 
-To declare them, he should add informations into the extra/jelix object in composer.json:
+To declare them, he should add information into the extra/jelix object in composer.json:
 
 ```json
 {
@@ -36,7 +42,7 @@ To declare them, he should add informations into the extra/jelix object in compo
 }
 ```
 
-In this object, he can add three type of informations:
+In this object, he can add three type of information:
 
 - `modules-dir`, an array containing directories where modules can be found.
   These paths will be added to the jelix configuration parameter `modulesPath`.
@@ -47,7 +53,7 @@ In this object, he can add three type of informations:
    as `<module>.path=<path>`.
 
 For instances, in the repository, if modules are in a "modules/" directory, the 
-author should add these informations into his composer.json:
+author should add these information into his composer.json:
 
 ```json
 {
@@ -77,6 +83,11 @@ the composer.json of the application:
 {
     "require": {
         "jelix/composer-module-setup": "^1.0.0"
+    },
+    "config": {
+        "allow-plugins": {
+          "jelix/composer-module-setup": true
+        }
     },
     "extra": {
         "jelix": {
@@ -126,7 +137,7 @@ In module packages, you can indicate on which entrypoint the module should be en
 file ( `id` attribute of the `<info>` element).
 
 In the composer.json of the application, you can also indicate the same informations
-for each modules, when a module does not provide an `"autoconfig-access-16"` configuration 
+for each module, when a module does not provide an `"autoconfig-access-16"` configuration 
 
 ```json
 {
@@ -156,9 +167,40 @@ for each modules, when a module does not provide an `"autoconfig-access-16"` con
 If the package has already an `"autoconfig-access-16"` configuration, this
 `modules-autoconfig-access-16` configuration has priority over it.
 
+## Indicating the path to the app or the configuration directory
+
+At the application level, the composer.json may content the path
+to the application directory (the directory containing the project.xml etc), and
+the path to the `var/config` directory.
+
+It is useful when the directory containing the composer.json file is not 
+the application directory and/or if the var/config is not in the application 
+directory
+
+So you must set these paths into `app-dir` and `var-config-dir`. Path should be
+relative to the composer.json directory, or can be absolute.
+
+```json
+{
+    "require": {
+        "jelix/composer-module-setup": "^1.0.0"
+    },
+    "extra": {
+        "jelix": {
+            "app-dir" : "myapp/",
+            "var-config-dir" : "/var/lib/myapp/config/",
+            "modules-dir" : []
+        }
+    }
+}
+```
+
+
+
 ## In Jelix 1.7 and higher
 
-In your application.init.php, you should include the jelix_app_path.php:
+In order to use modules declared into a composer.json file, you should include 
+the `jelix_app_path.php` file into your `application.init.php`:
 
 ```php
 <?php
@@ -179,6 +221,8 @@ require (__DIR__.'/vendor/jelix_app_path.php');
 
 ```
 
+This `jelix_app_path.php` file is generated automatically by the composer-module-setup plugin.
+
 Remember: in Jelix 1.7 and higher, declaring modules and plugins in the modulesPath/pluginsPath
 parameter in the configuration file is not supported anymore.
 
@@ -187,31 +231,6 @@ parameter in the configuration file is not supported anymore.
 The composer plugin declares automatically modules and plugins directory into 
 the localconfig.ini.php file or into the mainconfig.ini.php file, 
 in `modulesPath` and `pluginsPath` properties, and also in the `modules` section.
-
-However, at the application level, the composer.json may also content the path
-to the application directory (the directory containing the project.xml etc), and
-the path to the var/config directory.
-
-
-So if the directory containing the composer.json file is not the application 
-directory and/or if the var/config is not in the application directory, you must 
-set these paths into `app-dir` and `var-config-dir`. Path should be
-relative to the composer.json directory, or can be absolute.
-
-```json
-{
-    "require": {
-        "jelix/composer-module-setup": "^1.0.0"
-    },
-    "extra": {
-        "jelix": {
-            "app-dir" : "myapp/",
-            "var-config-dir" : "/var/lib/myapp/config/",
-            "modules-dir" : []
-        }
-    }
-}
-```
 
 You can also indicate if you want that the plugin modify localconfig.ini.php 
 or mainconfig.ini.php. By default it is localconfig.ini.php. Indicate the
