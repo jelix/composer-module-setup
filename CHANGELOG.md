@@ -1,3 +1,9 @@
+Version 1.0.11
+===============
+
+Fix Jelix 1.7 configurator: the configuration parameters `<module>.path` set
+by the Jelix 1.6 configurator should be removed.
+
 Version 1.0.10
 ==============
 
