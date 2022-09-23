@@ -5,6 +5,7 @@ namespace Jelix\ComposerPlugin;
 
 use Composer\Util\Filesystem;
 use Jelix\ComposerPlugin\Ini\IniModifier;
+use Jelix\ComposerPlugin\Ini\IniModifierInterface;
 
 /**
  * Setup configuration for a Jelix 1.7+ application
@@ -44,20 +45,21 @@ class SetupJelix17 {
         }
     }
 
-    function setup() {
+    function setup()
+    {
         $this->log("--- Setup jelix17 starts");
         $allModulesDir = $this->parameters->getAllModulesDirs();
         $allPluginsDir = $this->parameters->getAllPluginsDirs();
         $allModules = $this->parameters->getAllSingleModuleDirs();
 
-        $php = '<'.'?php'."\n";
+        $php = '<' . '?php' . "\n";
 
         if (count($allModulesDir)) {
             $php .= <<<EOF
 jApp::declareModulesDir(array(
 
 EOF;
-            foreach($allModulesDir as $dir) {
+            foreach ($allModulesDir as $dir) {
                 $php .= <<<EOF
             __DIR__.'/$dir',
 
@@ -71,7 +73,7 @@ EOF;
 jApp::declareModule(array(
 
 EOF;
-            foreach($allModules as $dir) {
+            foreach ($allModules as $dir) {
                 $php .= <<<EOF
             __DIR__.'/$dir',
 
@@ -85,7 +87,7 @@ EOF;
 jApp::declarePluginsDir(array(
 
 EOF;
-            foreach($allPluginsDir as $dir) {
+            foreach ($allPluginsDir as $dir) {
                 $php .= <<<EOF
             __DIR__.'/$dir',
 
@@ -93,12 +95,22 @@ EOF;
             }
             $php .= "));\n";
         }
-        file_put_contents($this->parameters->getVendorDir().'jelix_app_path.php', $php);
+        file_put_contents($this->parameters->getVendorDir() . 'jelix_app_path.php', $php);
 
+        $ini = $this->loadLocalConfigFile();
+        if ($ini) {
+            $this->setupConfig($ini, $allModules, $allModulesDir);
+            $ini->save();
+        }
+
+        $this->log("Setup for Jelix 1.7+ ends");
+    }
+
+    protected function setupConfig(IniModifierInterface $ini, $allModules, $allModulesDir)
+    {
         // we remove all `.path` key from the configuration that has been added
         // by the plugin for Jelix 1.6, in case the application was for Jelix 1.6 and
         // has been upgraded for Jelix 1.7
-        $ini = $this->loadLocalConfigFile();
 
         foreach($allModules as $path) {
             $path = $this->getFinalPath($path);
@@ -142,8 +154,6 @@ EOF;
                 }
             }
         }
-        $ini->save();
-        $this->log("Setup jelix17 ends");
     }
 
     /**
@@ -158,7 +168,8 @@ EOF;
         $iniFileName= $configDir.'localconfig.ini.php';
         if (!file_exists($iniFileName)) {
             if (!file_exists($configDir)) {
-                throw new \Exception('Configuration directory "'.$configDir.'" for the app does not exist');
+                // the application may not be exists yet
+                return null;
             }
             file_put_contents($iniFileName, "<"."?php\n;die(''); ?".">\n\n");
         }
