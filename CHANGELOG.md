@@ -1,3 +1,8 @@
+Version 1.0.12
+==============
+
+Fix Jelix 1.7 setup when no app exists yet.
+
 Version 1.0.11
 ===============
 
