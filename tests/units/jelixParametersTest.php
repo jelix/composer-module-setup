@@ -31,7 +31,6 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array(), $p->getPackages());
         $this->assertEquals(null, $p->getApplicationPackage());
         $this->assertEquals(array(), $p->getRemovedPackages());
-
     }
 
     function testAddAppPackage()
@@ -76,6 +75,11 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array(), $appPackage->getPluginsDirs());
         $this->assertEquals(array(), $appPackage->getSingleModuleDirs());
         $this->assertFalse($p->isJelix16());
+
+        $this->assertEquals(array(
+            'main2' => $appDir.'vendor/../modules2/main2'
+        ), $appPackage->getModules($vendorDir));
+
     }
 
     function testAddPackage()
@@ -137,6 +141,7 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array(), $appPackage->getPluginsDirs());
         $this->assertEquals(array(), $appPackage->getSingleModuleDirs());
 
+        $this->assertEquals(array(), $appPackage->getModules($vendorDir));
 
         $package = $packages['jelix/test1-module'];
         $this->assertNotEquals($package, $p->getApplicationPackage());
@@ -154,6 +159,11 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array(), $package->getPluginsDirs());
         $this->assertEquals(array(), $package->getSingleModuleDirs());
         $this->assertFalse($p->isJelix16());
+
+        $this->assertEquals(array(
+            'test1' => $appDir.'vendor/jelix/test1-module/modules/test1',
+            'test2' => $appDir.'vendor/jelix/test1-module/modules/test2'
+        ), $package->getModules($vendorDir));
 
         $p->saveToFile($vendorDir.'jelix_modules_infos_empty_result.json');
         $content = file_get_contents($vendorDir.'jelix_modules_infos_empty_result.json');

@@ -196,4 +196,29 @@ class JelixPackageParameters {
     {
         $this->singleModuleDirs[] = $path;
     }
+
+    /**
+     * @param string $vendorPath  path to the vendor directory
+     * @return string[]  list of modules. key=module name, value = absolute path
+     */
+    function getModules($vendorPath)
+    {
+        $modules = array();
+
+        foreach ($this->getModulesDirs() as $modulesDir) {
+            $dir = new \DirectoryIterator($vendorPath.$modulesDir);
+            foreach ($dir as $dirContent) {
+                if (!$dirContent->isDot() && $dirContent->isDir() && file_exists($dirContent->getPathName().'/module.xml')) {
+                    $modules[$dirContent->getFilename()] = $dirContent->getPathName();
+                }
+            }
+        }
+        foreach ($this->getSingleModuleDirs()  as $moduleDir) {
+            $moduleDir = $vendorPath.$moduleDir;
+            if (file_exists($moduleDir.'/module.xml')) {
+                $modules[basename(rtrim($moduleDir, '/'))] = $moduleDir;
+            }
+        }
+        return $modules;
+    }
 }
