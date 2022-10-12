@@ -16,7 +16,7 @@ use Composer\Installer\PackageEvent;
 /**
  * Main class of the plugin for Compose.
  *
- * This class should load our classes only during onPost* methods,
+ * Warning: this class should load our classes only during onPost* methods,
  * to be sure to load latest version of the plugin.
  *
  * @package Jelix\ComposerPlugin

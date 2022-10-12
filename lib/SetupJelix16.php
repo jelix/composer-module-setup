@@ -60,12 +60,6 @@ class SetupJelix16 {
      * Update the configuration of the application according to informations
      * readed from all composer.json
      *
-     * Warning: during upgrade of composer-module-setup, it seems Composer load some classes
-     * of the previous version (here ModuleSetup + JelixParameters), and load
-     * other classes (here SetupJelix16) after the upgrade. so API is not the one we expected.
-     * so we should check if the new methods of JelixParameters are there before
-     * using them.
-     *
      * @throws \Exception
      */
     function setup() {
@@ -165,12 +159,7 @@ class SetupJelix16 {
         $configDir = $this->parameters->getVarConfigDir();
 
         // open the configuration file
-        if (method_exists($this->parameters, 'getConfigFileName')) {
-            $iniFileName = $this->parameters->getConfigFileName();
-        }
-        else {
-            $iniFileName = 'localconfig.ini.php';
-        }
+        $iniFileName = $this->parameters->getConfigFileName();
         if (!$iniFileName) {
             $iniFileName = 'localconfig.ini.php';
         }
