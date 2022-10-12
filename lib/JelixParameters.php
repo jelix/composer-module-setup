@@ -52,18 +52,31 @@ class JelixParameters {
         $this->vendorDir = rtrim($vendorDir, '/').'/';
     }
 
-    function loadFromFile($filepath)
+    function loadFromFile($fileName = '')
     {
-        $file = new PackagesInformationFile($filepath);
-        list (
-            $this->packagesInfos,
-            $this->jelixTarget
-            ) = $file->load();
+        // for old version of ModuleSetup
+        if (strpos($fileName, $this->vendorDir) === 0 ) {
+            $fileName = basename($fileName);
+        }
+        $file = new PackagesInformationFile($this->vendorDir, $fileName);
+        if ($file->exists()) {
+            list (
+                $this->packagesInfos,
+                $this->jelixTarget
+                ) = $file->load();
+            return true;
+        }
+        return false;
     }
 
-    function saveToFile($filepath)
+    function saveToFile($fileName = '')
     {
-        $file = new PackagesInformationFile($filepath);
+        // for old version of ModuleSetup
+        if (strpos($fileName, $this->vendorDir) === 0 ) {
+            $fileName = basename($fileName);
+        }
+        $file = new PackagesInformationFile($this->vendorDir, $fileName);
+
         $file->save($this->packagesInfos, $this->jelixTarget);
     }
 

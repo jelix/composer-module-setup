@@ -40,7 +40,7 @@ class jelix16ParametersTest extends \PHPUnit\Framework\TestCase
         $vendorDir = $appDir.'vendor/';
         $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
 
-        $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
+        $p->loadFromFile('jelix_modules_infos_empty.json');
 
         $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
@@ -85,7 +85,7 @@ class jelix16ParametersTest extends \PHPUnit\Framework\TestCase
         $vendorDir = $appDir.'vendor/';
         $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
 
-        $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
+        $p->loadFromFile('jelix_modules_infos_empty.json');
 
         $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (

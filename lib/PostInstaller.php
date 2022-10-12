@@ -42,10 +42,7 @@ class PostInstaller
     public function process($packages, $appPackage)
     {
         $jelixParameters = new JelixParameters($this->vendorDir);
-        $jsonInfosFile = $this->vendorDir.'jelix_modules_infos.json';
-        if (file_exists($jsonInfosFile)) {
-            $jelixParameters->loadFromFile($jsonInfosFile);
-        }
+        $jelixParameters->loadFromFile();
 
         foreach($packages as $packageInfo) {
             $action = $packageInfo[0];
@@ -69,7 +66,7 @@ class PostInstaller
             $this->writeError($e->getMessage());
         }
 
-        $jelixParameters->saveToFile($jsonInfosFile);
+        $jelixParameters->saveToFile();
 
         if ($jelixParameters->isJelix16()) {
             $setup = new SetupJelix16($jelixParameters, $this->debugLogger);

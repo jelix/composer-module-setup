@@ -17,7 +17,7 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
         $vendorDir = realpath(__DIR__.'/../tmp/app2/vendor/').'/';
         $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
 
-        $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
+        $p->loadFromFile('jelix_modules_infos_empty.json');
 
         $this->assertEquals('', $p->getAppDir());
         $this->assertEquals('', $p->getVarConfigDir());
@@ -39,7 +39,7 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
         $vendorDir = $appDir.'vendor/';
         $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
 
-        $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
+        $p->loadFromFile('jelix_modules_infos_empty.json');
 
         $p->addApplicationPackage('jelix/app2-tests', array(
             "jelix" => array (
@@ -88,7 +88,7 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
         $vendorDir = $appDir.'vendor/';
         $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
 
-        $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
+        $p->loadFromFile('jelix_modules_infos_empty.json');
 
         $p->addApplicationPackage('jelix/app2-tests', array(
             "jelix" => array (
@@ -165,7 +165,7 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
             'test2' => $appDir.'vendor/jelix/test1-module/modules/test2'
         ), $package->getModules($vendorDir));
 
-        $p->saveToFile($vendorDir.'jelix_modules_infos_empty_result.json');
+        $p->saveToFile('jelix_modules_infos_empty_result.json');
         $content = file_get_contents($vendorDir.'jelix_modules_infos_empty_result.json');
         $expected = file_get_contents($vendorDir.'jelix_modules_infos_empty_expected_result.json');
         $this->assertEquals($expected, $content);

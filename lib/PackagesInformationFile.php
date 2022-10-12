@@ -12,9 +12,17 @@ class PackagesInformationFile
 {
     protected $path;
 
-    function __construct($filename)
+    function __construct($vendorDir, $filename = '')
     {
-        $this->path = $filename;
+        if ($filename == '') {
+            $filename = 'jelix_modules_infos.json';
+        }
+        $this->path = rtrim($vendorDir, '/').'/'.$filename;
+    }
+
+    function exists()
+    {
+        return file_exists($this->path);
     }
 
     /**
@@ -25,7 +33,7 @@ class PackagesInformationFile
         $content = json_decode(file_get_contents($this->path), true);
 
         if (!isset($content['packages'])) {
-            return array();
+            return array(array(), '');
         }
         $jelixTarget = '';
         if (isset($content['target-jelix-version'])) {

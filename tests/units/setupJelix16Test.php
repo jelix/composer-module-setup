@@ -674,7 +674,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
         $vendorDir = $appDir.'vendor/';
         $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
 
-        $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
+        $p->loadFromFile('jelix_modules_infos_empty.json');
 
         $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
@@ -750,7 +750,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
 
         // now let's simulate an update with a different entrypoint configuration
         $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
-        $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
+        $p->loadFromFile('jelix_modules_infos_empty.json');
         $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
@@ -829,7 +829,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
         $vendorDir = $appDir.'vendor/';
         $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
 
-        $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
+        $p->loadFromFile('jelix_modules_infos_empty.json');
 
         $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
@@ -906,7 +906,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
         // now let's simulate a remove of the package
 
         $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
-        $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
+        $p->loadFromFile('jelix_modules_infos_empty.json');
         $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
@@ -985,7 +985,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
         $vendorDir = $appDir.'vendor/';
         $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
 
-        $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
+        $p->loadFromFile('jelix_modules_infos_empty.json');
 
         $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
@@ -1060,7 +1060,7 @@ class setupJelix16Test extends \PHPUnit\Framework\TestCase
         // now let's simulate a remove of the package
 
         $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
-        $p->loadFromFile($vendorDir.'jelix_modules_infos_empty.json');
+        $p->loadFromFile('jelix_modules_infos_empty.json');
         $p->addApplicationPackage('jelix/app1-tests', array(
             "jelix" => array (
                 "app-dir" => "./"
