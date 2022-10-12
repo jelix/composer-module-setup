@@ -144,49 +144,15 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
     public function onPostInstall(\Composer\Script\Event $event)
     {
         $this->debugLogger->log("onPostInstall");
-        $jelixParameters = new JelixParameters($this->vendorDir);
-        $jsonInfosFile = $this->vendorDir.'jelix_modules_infos.json';
-        if (file_exists($jsonInfosFile)) {
-            $jelixParameters->loadFromFile($jsonInfosFile);
-        }
-
-        foreach($this->packages as $packageInfo) {
-            $action = $packageInfo[0];
-            if ($action == 'removed') {
-                $jelixParameters->removePackage($packageInfo[1], $packageInfo[2]);
-            }
-            else {
-                try {
-                    list($action, $name, $extra, $path) = $packageInfo;
-                    $jelixParameters->addPackage($name, $extra, $path);
-                } catch (ReaderException $e) {
-                    $this->io->writeError($e->getMessage());
-                }
-            }
-        }
-
-        // let's add the app package
-        try {
-            $appPackage = $this->composer->getPackage();
-            $jelixParameters->addApplicationPackage($appPackage->getName(), $appPackage->getExtra(), getcwd());
-        } catch (ReaderException $e) {
-            $this->io->writeError($e->getMessage());
-        }
-
-        $jelixParameters->saveToFile($jsonInfosFile);
-
-        if ($jelixParameters->isJelix16()) {
-            $setup = new SetupJelix16($jelixParameters, $this->debugLogger);
-            $setup->setup();
-        } else {
-            $setup = new SetupJelix17($jelixParameters, $this->debugLogger);
-            $setup->setup();
-        }
+        $postInstaller = new PostInstaller($this->vendorDir, $this->io, $this->debugLogger);
+        $postInstaller->process($this->packages, $this->composer->getPackage());
     }
 
     public function onPostUpdate(\Composer\Script\Event $event)
     {
-        $this->onPostInstall($event);
+        $this->debugLogger->log("onPostUpdate");
+        $postInstaller = new PostInstaller($this->vendorDir, $this->io, $this->debugLogger);
+        $postInstaller->process($this->packages, $this->composer->getPackage());
     }
 
     public function deactivate(Composer $composer, IOInterface $io)
