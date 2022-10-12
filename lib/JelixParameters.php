@@ -54,56 +54,17 @@ class JelixParameters {
 
     function loadFromFile($filepath)
     {
-        $content = json_decode(file_get_contents($filepath), true);
-
-        if (!isset($content['packages'])) {
-            return;
-        }
-
-        if (isset($content['target-jelix-version'])) {
-            $this->jelixTarget = $content['target-jelix-version'];
-        }
-
-        foreach($content['packages'] as $package => $infos) {
-            $content = array_merge_recursive(
-                array(
-                    'is-app'=>false,
-                    'modules-dirs'=>array(),
-                    'plugins-dirs'=>array(),
-                    'modules'=>array(),
-                    'autoconfig-access-16'=>array(),
-                    'modules-autoconfig-access-16'=>array()
-                ),
-                $infos
-            );
-            $parameters = new JelixPackageParameters($package, $content['is-app']);
-            $parameters->setModulesDirs($content['modules-dirs']);
-            $parameters->setPluginsDirs($content['plugins-dirs']);
-            $parameters->setSingleModuleDirs($content['modules']);
-            $parameters->setAppModulesAccess($content['autoconfig-access-16']);
-            $parameters->setPackageModulesAccess($content['modules-autoconfig-access-16']);
-            $this->packagesInfos[$package] = $parameters;
-        }
+        $file = new PackagesInformationFile($filepath);
+        list (
+            $this->packagesInfos,
+            $this->jelixTarget
+            ) = $file->load();
     }
 
     function saveToFile($filepath)
     {
-        $content = array(
-            'version'=>1,
-            'target-jelix-version' => $this->jelixTarget,
-            'packages'=>array(),
-            ''
-        );
-        foreach($this->packagesInfos as $package => $parameters) {
-            $content['packages'][$package] = array(
-                'modules-dirs'=>$parameters->getModulesDirs(),
-                'plugins-dirs'=>$parameters->getPluginsDirs(),
-                'modules'=>$parameters->getSingleModuleDirs(),
-                'autoconfig-access-16'=>$parameters->getAppModulesAccess(),
-                'modules-autoconfig-access-16'=>$parameters->getPackageModulesAccess(),
-            );
-        }
-        file_put_contents($filepath, json_encode($content, JSON_PRETTY_PRINT));
+        $file = new PackagesInformationFile($filepath);
+        $file->save($this->packagesInfos, $this->jelixTarget);
     }
 
     function getAppDir() {

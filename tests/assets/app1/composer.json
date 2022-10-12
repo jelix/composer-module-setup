@@ -12,6 +12,11 @@
       }
     }
   ],
+  "config": {
+    "allow-plugins": {
+      "jelix/composer-module-setup": true
+    }
+  },
   "require": {
     "jelix/composer-module-setup": "@dev",
     "jelix/file-utilities": "1.8.*",

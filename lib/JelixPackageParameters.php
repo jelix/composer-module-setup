@@ -2,7 +2,12 @@
 
 namespace Jelix\ComposerPlugin;
 
-
+/**
+ * Information about a package
+ *
+ * @internal Warning: this class should not rely on Composer classes, to be able to use
+ * by other packages that need to have information about a package.
+ */
 class JelixPackageParameters {
 
     protected $modulesDirs = array();
