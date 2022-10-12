@@ -1,3 +1,11 @@
+Version 1.1.0
+=============
+
+- new method `Jelix\ComposerPlugin\JelixPackageParameters::getModules()`, returning the list of Jelix modules embedded into the package
+- new class `Jelix\ComposerPlugin\PackagesInformationFile`, to retrieve
+  information about all Jelix packages from any package.
+
+
 Version 1.0.12
 ==============
 
