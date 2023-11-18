@@ -23,6 +23,10 @@
         "psr-4": { "Jelix\\ComposerPlugin\\": "lib/" }
     },
     "extra": {
+      "branch-alias": {
+        "dev-jelix2": "2.0-dev",
+        "dev-master": "1.1-dev"
+      },
         "class": "Jelix\\ComposerPlugin\\ModuleSetup"
     },
     "minimum-stability": "stable"
