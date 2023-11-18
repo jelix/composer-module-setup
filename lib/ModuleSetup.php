@@ -4,14 +4,14 @@ namespace Jelix\ComposerPlugin;
 
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
+use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Package\CompletePackage;
 use Composer\Package\PackageInterface;
 use Composer\Plugin\PluginInterface;
-use Composer\Plugin\PluginEvents;
 use Composer\Script\ScriptEvents;
-use Composer\Installer\PackageEvent;
+use Jelix\ComposerPlugin\PostInstall\PostInstaller;
 
 /**
  * Main class of the plugin for Compose.

@@ -1,9 +1,10 @@
 <?php
 
-namespace Jelix\ComposerPlugin;
+namespace Jelix\ComposerPlugin\PostInstall;
 
 
 use Composer\Util\Filesystem;
+use Jelix\ComposerPlugin\DebugLogger;
 use Jelix\ComposerPlugin\Ini\IniModifier;
 use Jelix\ComposerPlugin\Ini\IniModifierInterface;
 

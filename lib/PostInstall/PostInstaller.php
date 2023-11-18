@@ -1,7 +1,9 @@
 <?php
 
-namespace Jelix\ComposerPlugin;
+namespace Jelix\ComposerPlugin\PostInstall;
 
+
+use Jelix\ComposerPlugin\DummyLogger;
 
 class PostInstaller
 {

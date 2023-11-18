@@ -1,5 +1,8 @@
 <?php
 
+use Jelix\ComposerPlugin\PostInstall\JelixParameters;
+
+
 class jelixParametersTest extends \PHPUnit\Framework\TestCase
 {
     function setUp() : void  {
@@ -15,7 +18,7 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
     function testLoadEmptyInfos1()
     {
         $vendorDir = realpath(__DIR__.'/../tmp/app2/vendor/').'/';
-        $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
+        $p = new JelixParameters($vendorDir);
 
         $p->loadFromFile('jelix_modules_infos_empty.json');
 
@@ -37,7 +40,7 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
     {
         $appDir = realpath(__DIR__.'/../tmp/app2/').'/';
         $vendorDir = $appDir.'vendor/';
-        $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
+        $p = new JelixParameters($vendorDir);
 
         $p->loadFromFile('jelix_modules_infos_empty.json');
 
@@ -86,7 +89,7 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
     {
         $appDir = realpath(__DIR__.'/../tmp/app2/').'/';
         $vendorDir = $appDir.'vendor/';
-        $p = new \Jelix\ComposerPlugin\JelixParameters($vendorDir);
+        $p = new JelixParameters($vendorDir);
 
         $p->loadFromFile('jelix_modules_infos_empty.json');
 

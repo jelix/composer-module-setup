@@ -1,7 +1,8 @@
 <?php
 
-namespace Jelix\ComposerPlugin;
+namespace Jelix\ComposerPlugin\PostInstall;
 use Composer\Util\Filesystem;
+use Jelix\ComposerPlugin\DebugLogger;
 use Jelix\ComposerPlugin\Ini\IniModifier;
 
 /**
@@ -256,7 +257,7 @@ class SetupJelix16 {
         if (!file_exists($appDir . '/project.xml')) {
             throw new \Exception("The directory of the jelix application cannot be found. Indicate its path into the composer.json of the application, into an extra/jelix/app-dir parameter");
         }
-        $xml = simplexml_load_file($appDir.'/project.xml');
+        $xml = \simplexml_load_file($appDir.'/project.xml');
         // read all entry points data
         foreach ($xml->entrypoints->entry as $entrypoint) {
             $file                     = (string)$entrypoint['file'];

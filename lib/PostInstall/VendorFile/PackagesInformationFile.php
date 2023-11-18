@@ -1,6 +1,8 @@
 <?php
 
-namespace Jelix\ComposerPlugin;
+namespace Jelix\ComposerPlugin\PostInstall\VendorFile;
+
+use Jelix\ComposerPlugin\PostInstall\JelixPackageParameters;
 
 /**
  * Class to load and save the file vendor/jelix_modules_infos.json

@@ -1,6 +1,6 @@
 <?php
 
-namespace Jelix\ComposerPlugin;
+namespace Jelix\ComposerPlugin\PostInstall;
 
 
 class JelixModuleAccess {

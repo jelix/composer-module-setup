@@ -1,8 +1,8 @@
 <?php
 
-namespace Jelix\ComposerPlugin;
+namespace Jelix\ComposerPlugin\PostInstall;
 use Composer\Util\Filesystem;
-use Composer\Package\PackageInterface;
+use Jelix\ComposerPlugin\PostInstall\VendorFile\PackagesInformationFile;
 
 class JelixParameters {
 
