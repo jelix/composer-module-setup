@@ -107,14 +107,16 @@ class JelixPackageParameters {
         foreach ($this->getModulesDirs() as $modulesDir) {
             $dir = new \DirectoryIterator($vendorPath.$modulesDir);
             foreach ($dir as $dirContent) {
-                if (!$dirContent->isDot() && $dirContent->isDir() && file_exists($dirContent->getPathName().'/module.xml')) {
+                if (!$dirContent->isDot() && $dirContent->isDir() &&
+                    (file_exists($dirContent->getPathName().'/module.xml') ||
+                        file_exists($dirContent->getPathName().'/jelix-module.json'))) {
                     $modules[$dirContent->getFilename()] = $dirContent->getPathName();
                 }
             }
         }
         foreach ($this->getSingleModuleDirs()  as $moduleDir) {
             $moduleDir = $vendorPath.$moduleDir;
-            if (file_exists($moduleDir.'/module.xml')) {
+            if (file_exists($moduleDir.'/module.xml') || file_exists($moduleDir.'/jelix-module.json')) {
                 $modules[basename(rtrim($moduleDir, '/'))] = $moduleDir;
             }
         }

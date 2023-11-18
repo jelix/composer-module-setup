@@ -129,7 +129,7 @@ class JelixParameters {
             if (!$this->appDir || !file_exists($this->appDir)) {
                 throw new ReaderException("Error in composer.json of " . $packageName . ": extra/jelix/app-dir is not set or does not contain a valid path");
             }
-            if (!file_exists($this->appDir . '/project.xml')) {
+            if (!file_exists($this->appDir . '/project.xml') && !file_exists($this->appDir . '/jelix-app.json')) {
                 throw new ReaderException("Error in composer.json of " . $packageName . ": extra/jelix/app-dir is not a path to a Jelix application");
             }
 

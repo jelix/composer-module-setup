@@ -2,11 +2,11 @@
 
 A plugin for Composer to declare automatically jelix modules into a jelix application
 
-For Jelix 1.6.9 and higher.
+For Jelix 2.0.0-pre and higher.
 
 Authors who provide their modules via Composer, should declare directories 
 containing modules or plugins. It will avoid the developer to declare them 
-into his application.init.php (Jelix 1.7).
+into the application.init.php of the project.
 
 ## installation
 
@@ -16,7 +16,7 @@ the plugin to be executed by Composer.
 ```json
 {
     "require": {
-        "jelix/composer-module-setup": "^1.0.0"
+        "jelix/composer-module-setup": "^2.0.0"
     },
     "config": {
         "allow-plugins": {
@@ -82,7 +82,7 @@ the composer.json of the application:
 ```json
 {
     "require": {
-        "jelix/composer-module-setup": "^1.0.0"
+        "jelix/composer-module-setup": "^2.0.0"
     },
     "config": {
         "allow-plugins": {
@@ -122,7 +122,7 @@ relative to the composer.json directory, or can be absolute.
 ```json
 {
     "require": {
-        "jelix/composer-module-setup": "^1.1.0"
+        "jelix/composer-module-setup": "^2.0.0"
     },
     "extra": {
         "jelix": {
@@ -136,7 +136,7 @@ relative to the composer.json directory, or can be absolute.
 
 
 
-## In Jelix 1.7 and higher
+## In Jelix 2.0
 
 In order to use modules declared into a composer.json file, you should include 
 the `jelix_app_path.php` file into your `application.init.php`:
@@ -162,8 +162,6 @@ require (__DIR__.'/vendor/jelix_app_path.php');
 
 This `jelix_app_path.php` file is generated automatically by the composer-module-setup plugin.
 
-Remember: in Jelix 1.7 and higher, declaring modules and plugins in the modulesPath/pluginsPath
-parameter in the configuration file is not supported anymore.
 
 ## debugging the plugin
 

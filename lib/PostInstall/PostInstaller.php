@@ -72,7 +72,7 @@ class PostInstaller
         $jelixParameters->saveToFile();
 
         // launch the setup of the application
-        $setup = new SetupJelix17($jelixParameters, $this->debugLogger);
+        $setup = new SetupJelix20($jelixParameters, $this->debugLogger);
         $setup->setup();
 
     }

@@ -9,9 +9,9 @@ use Jelix\ComposerPlugin\Ini\IniModifier;
 use Jelix\ComposerPlugin\Ini\IniModifierInterface;
 
 /**
- * Setup configuration for a Jelix 1.7+ application
+ * Setup configuration for a Jelix 2.0+ application
  */
-class SetupJelix17 {
+class SetupJelix20 {
 
     /**
      * @var JelixParameters
@@ -48,7 +48,7 @@ class SetupJelix17 {
 
     function setup()
     {
-        $this->log("--- Setup jelix17 starts");
+        $this->log("--- Setup jelix 2.0 starts");
         $allModulesDir = $this->parameters->getAllModulesDirs();
         $allPluginsDir = $this->parameters->getAllPluginsDirs();
         $allModules = $this->parameters->getAllSingleModuleDirs();
@@ -57,7 +57,7 @@ class SetupJelix17 {
 
         if (count($allModulesDir)) {
             $php .= <<<EOF
-jApp::declareModulesDir(array(
+\Jelix\Core\App::declareModulesDir(array(
 
 EOF;
             foreach ($allModulesDir as $dir) {
@@ -71,7 +71,7 @@ EOF;
 
         if (count($allModules)) {
             $php .= <<<EOF
-jApp::declareModule(array(
+\Jelix\Core\App::declareModule(array(
 
 EOF;
             foreach ($allModules as $dir) {
@@ -85,7 +85,7 @@ EOF;
 
         if (count($allPluginsDir)) {
             $php .= <<<EOF
-jApp::declarePluginsDir(array(
+\Jelix\Core\App::declarePluginsDir(array(
 
 EOF;
             foreach ($allPluginsDir as $dir) {
@@ -104,14 +104,14 @@ EOF;
             $ini->save();
         }
 
-        $this->log("Setup for Jelix 1.7+ ends");
+        $this->log("Setup for Jelix 2.0+ ends");
     }
 
     protected function setupConfig(IniModifierInterface $ini, $allModules, $allModulesDir)
     {
         // we remove all `.path` key from the configuration that has been added
         // by the plugin for Jelix 1.6, in case the application was for Jelix 1.6 and
-        // has been upgraded for Jelix 1.7
+        // has been upgraded for Jelix 1.7+
 
         foreach($allModules as $path) {
             $path = $this->getFinalPath($path);
@@ -138,7 +138,7 @@ EOF;
 
         // remove path of modules that do not exist anymore into the vendor
         // directory (it could be modules that disappear from packages because
-        // not compatible with jelix 1.7)
+        // not compatible with jelix 2.0)
         $vendorPath = $this->getFinalPath('./');
         $vendorDir = $this->parameters->getVendorDir();
         foreach($ini->getValues('modules') as $key => $val) {

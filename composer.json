@@ -19,6 +19,10 @@
         "phpunit/phpunit": "9.5.*",
         "jelix/file-utilities": "1.8.*"
     },
+    "conflict": {
+      "jelix/jelix": "<1.99.99",
+      "jelix/jelix-essential": "<1.99.99"
+    },
     "autoload": {
         "psr-4": { "Jelix\\ComposerPlugin\\": "lib/" }
     },
