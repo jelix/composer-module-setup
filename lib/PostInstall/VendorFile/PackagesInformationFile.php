@@ -49,8 +49,6 @@ class PackagesInformationFile
                     'modules-dirs'=>array(),
                     'plugins-dirs'=>array(),
                     'modules'=>array(),
-                    'autoconfig-access-16'=>array(),
-                    'modules-autoconfig-access-16'=>array()
                 ),
                 $infos
             );
@@ -58,8 +56,6 @@ class PackagesInformationFile
             $parameters->setModulesDirs($content['modules-dirs']);
             $parameters->setPluginsDirs($content['plugins-dirs']);
             $parameters->setSingleModuleDirs($content['modules']);
-            $parameters->setAppModulesAccess($content['autoconfig-access-16']);
-            $parameters->setPackageModulesAccess($content['modules-autoconfig-access-16']);
             $packagesInfos[$package] = $parameters;
         }
         return array($packagesInfos, $jelixTarget);
@@ -76,15 +72,12 @@ class PackagesInformationFile
             'version'=>1,
             'target-jelix-version' => $jelixTarget,
             'packages'=>array(),
-            ''
         );
         foreach($packagesInfos as $package => $parameters) {
             $content['packages'][$package] = array(
                 'modules-dirs'=>$parameters->getModulesDirs(),
                 'plugins-dirs'=>$parameters->getPluginsDirs(),
                 'modules'=>$parameters->getSingleModuleDirs(),
-                'autoconfig-access-16'=>$parameters->getAppModulesAccess(),
-                'modules-autoconfig-access-16'=>$parameters->getPackageModulesAccess(),
             );
         }
         file_put_contents($this->path, json_encode($content, JSON_PRETTY_PRINT));

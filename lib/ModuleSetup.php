@@ -137,7 +137,7 @@ class ModuleSetup  implements PluginInterface, EventSubscriberInterface {
         if ($this->mustIgnorePackage($removedPackage)) {
             return;
         }
-        $this->packages[] = array('removed', $removedPackage->getName(), $removedPackage->getExtra());
+        $this->packages[] = array('removed', $removedPackage->getName(), $removedPackage->getExtra(), '');
         $this->debugLogger->log("onPackageUninstall: ".$removedPackage->getName());
     }
 

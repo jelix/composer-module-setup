@@ -72,12 +72,9 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($appPackage->isApp());
         $this->assertEquals('jelix/app2-tests', $appPackage->getPackageName());
-        $this->assertEquals(array(), $appPackage->getPackageModulesAccess());
-        $this->assertEquals(array(), $appPackage->getAppModulesAccess());
         $this->assertEquals(array('../modules2'), $appPackage->getModulesDirs());
         $this->assertEquals(array(), $appPackage->getPluginsDirs());
         $this->assertEquals(array(), $appPackage->getSingleModuleDirs());
-        $this->assertFalse($p->isJelix16());
 
         $this->assertEquals(array(
             'main2' => $appDir.'vendor/../modules2/main2'
@@ -106,15 +103,6 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
                 "jelix" => array (
                     "modules-dir" => [
                         'modules/'
-                    ],
-                    "autoconfig-access-16" => [
-                        "jelix/app2-tests" => [
-                            "test1" => [
-                                "__global"=> 1,
-                                "index" =>2,
-                                "admin" => 1
-                            ]
-                        ]
                     ]
                 )
             ), $vendorDir.'jelix/test1-module/');
@@ -138,8 +126,6 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($appPackage->isApp());
         $this->assertEquals('jelix/app2-tests', $appPackage->getPackageName());
-        $this->assertEquals(array(), $appPackage->getPackageModulesAccess());
-        $this->assertEquals(array(), $appPackage->getAppModulesAccess());
         $this->assertEquals(array(), $appPackage->getModulesDirs());
         $this->assertEquals(array(), $appPackage->getPluginsDirs());
         $this->assertEquals(array(), $appPackage->getSingleModuleDirs());
@@ -150,18 +136,9 @@ class jelixParametersTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEquals($package, $p->getApplicationPackage());
         $this->assertFalse($package->isApp());
         $this->assertEquals('jelix/test1-module', $package->getPackageName());
-        $this->assertEquals(array(), $package->getPackageModulesAccess());
-        $this->assertEquals(array("jelix/app2-tests" => [
-            "test1" => [
-                "__global"=> 1,
-                "index" =>2,
-                "admin" => 1
-            ]
-        ]), $package->getAppModulesAccess());
         $this->assertEquals(array('jelix/test1-module/modules'), $package->getModulesDirs());
         $this->assertEquals(array(), $package->getPluginsDirs());
         $this->assertEquals(array(), $package->getSingleModuleDirs());
-        $this->assertFalse($p->isJelix16());
 
         $this->assertEquals(array(
             'test1' => $appDir.'vendor/jelix/test1-module/modules/test1',

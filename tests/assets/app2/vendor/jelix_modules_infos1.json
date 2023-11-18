@@ -6,9 +6,7 @@
                 "jelix\/test1-module\/modules"
             ],
             "plugins-dirs": [],
-            "modules": [],
-            "autoconfig-access-16": [],
-            "modules-autoconfig-access-16": []
+            "modules": []
         }
     }
 }

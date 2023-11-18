@@ -6,7 +6,7 @@ For Jelix 1.6.9 and higher.
 
 Authors who provide their modules via Composer, should declare directories 
 containing modules or plugins. It will avoid the developer to declare them 
-into his application.init.php (Jelix 1.7) or in the configuration (Jelix 1.6.9+).
+into his application.init.php (Jelix 1.7).
 
 ## installation
 
@@ -106,67 +106,6 @@ the composer.json of the application:
 ```
 
 
-## Enable modules on entrypoints automatically (jelix 1.6 only)
-
-In module packages, you can indicate on which entrypoint the module should be enabled.
-
-```json
-{
-    "extra": {
-        "jelix": {
-            "autoconfig-access-16" : {
-                "__any_app" : {
-                    "<modulename>": {
-                        "__global": 1
-                    }
-                },
-                "app/identifiant1" : {
-                    "<modulename>": {
-                        "__global": 1,
-                        "index" : 2,
-                        "admin" : 1   
-                    }
-                }
-            }
-        }
-    }
-}
-```
-
-`app/identifiant1` must be the application id that is indicated into the `project.xml`
-file ( `id` attribute of the `<info>` element).
-
-In the composer.json of the application, you can also indicate the same informations
-for each module, when a module does not provide an `"autoconfig-access-16"` configuration 
-
-```json
-{
-    "extra": {
-        "jelix": {
-            "modules-autoconfig-access-16" : {
-                "package/name1" : {
-                    "<modulename>": {
-                        "__global": 1,
-                        "index" : 2,
-                        "admin" : 1   
-                    }
-                },
-                "package/name2" : {
-                    "<modulename>": {
-                        "__global": 1,
-                        "index" : 2,
-                        "admin" : 1   
-                    }
-                }
-            }
-        }
-    }
-}
-```
-
-If the package has already an `"autoconfig-access-16"` configuration, this
-`modules-autoconfig-access-16` configuration has priority over it.
-
 ## Indicating the path to the app or the configuration directory
 
 At the application level, the composer.json may content the path
@@ -225,33 +164,6 @@ This `jelix_app_path.php` file is generated automatically by the composer-module
 
 Remember: in Jelix 1.7 and higher, declaring modules and plugins in the modulesPath/pluginsPath
 parameter in the configuration file is not supported anymore.
-
-## In Jelix 1.6.x equal or higher than 1.6.9
-
-The composer plugin declares automatically modules and plugins directory into 
-the localconfig.ini.php file or into the mainconfig.ini.php file, 
-in `modulesPath` and `pluginsPath` properties, and also in the `modules` section.
-
-You can also indicate if you want that the plugin modify localconfig.ini.php 
-or mainconfig.ini.php. By default it is localconfig.ini.php. Indicate the
-configuration filename into `config-file-16`:
-
-
-```json
-{
-    "require": {
-        "jelix/composer-module-setup": "^1.0.0"
-    },
-    "extra": {
-        "jelix": {
-            "app-dir" : "myapp/",
-            "var-config-dir" : "/var/lib/myapp/config/",
-            "modules-dir" : [],
-            "config-file-16": "mainconfig.ini.php"
-        }
-    }
-}
-```
 
 ## debugging the plugin
 

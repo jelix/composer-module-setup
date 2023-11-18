@@ -35,8 +35,6 @@ class JelixParameters {
      */
     protected $appDir = null;
 
-    protected $autoconfig16 = array();
-
     protected $jelixTarget = '';
 
     /**
@@ -158,33 +156,6 @@ class JelixParameters {
             $this->jelixTarget = $v[1];
         } else if (file_exists($this->appDir . 'app/system/mainconfig.ini.php')) {
             $this->jelixTarget = '1.7';
-        } else if (file_exists($this->varConfigDir . 'mainconfig.ini.php')) {
-            $this->jelixTarget = '1.6';
-        }
-
-        if (isset($extra['jelix']['config-file-16'])) {
-            $this->configurationFileName = $extra['jelix']['config-file-16'];
-        }
-
-        if (isset($extra['jelix']['modules-autoconfig-access-16'])) {
-            $modulesAccess = $extra['jelix']['modules-autoconfig-access-16'];
-            if (is_array($modulesAccess)) {
-                $cleanedModulesAccess = array();
-                foreach ($extra['jelix']['modules-autoconfig-access-16'] as $package => $moduleAccess) {
-                    if (!is_string($package) || !is_array($moduleAccess)) {
-                        continue;
-                    }
-                    foreach ($moduleAccess as $module => $access) {
-                        if (is_array($access)) {
-                            if (!array_key_exists($package, $cleanedModulesAccess)) {
-                                $cleanedModulesAccess[$package] = array();
-                            }
-                            $cleanedModulesAccess[$package][$module] = $access;
-                        }
-                    }
-                }
-                $parameters->setPackageModulesAccess($cleanedModulesAccess);
-            }
         }
 
         // read information that can be in any composer.json
@@ -209,9 +180,6 @@ class JelixParameters {
         if (!isset($extra['jelix'])) {
             return;
         }
-
-        // read information from the composer.json of a module package
-        $this->readAutoconfigAccess($parameters, $extra);
 
         // read information that can be in any composer.json
         $this->readModuleDirs($packageName, $packagePath, $parameters, $extra);
@@ -252,37 +220,6 @@ class JelixParameters {
         }
     }
 
-    /**
-     * read informations from the composer.json of a module package
-     *
-     * @param JelixPackageParameters $parameters
-     * @param $extra
-     * @return void
-     */
-    protected function readAutoconfigAccess(JelixPackageParameters $parameters, $extra)
-    {
-        if (isset($extra['jelix']['autoconfig-access-16'])) {
-            $modulesAccess = $extra['jelix']['autoconfig-access-16'];
-            if (is_array($modulesAccess)) {
-                $cleanedModulesAccess = array();
-                foreach($extra['jelix']['autoconfig-access-16'] as $app => $moduleAccess) {
-                    if (!is_string($app) || !is_array($moduleAccess)) {
-                        continue;
-                    }
-                    foreach($moduleAccess as $module =>$access) {
-                        if (is_array($access)) {
-                            if (!array_key_exists($app, $cleanedModulesAccess)) {
-                                $cleanedModulesAccess[$app] = array();
-                            }
-                            $cleanedModulesAccess[$app][$module] = $access;
-                        }
-                    }
-                }
-                $parameters->setAppModulesAccess($cleanedModulesAccess);
-            }
-        }
-    }
-
     function removePackage($packageName, $extra) {
         if(isset($this->packagesInfos[$packageName]))
         {
@@ -291,7 +228,6 @@ class JelixParameters {
 
         $parameters = new JelixPackageParameters($packageName, false);
         $this->removedPackagesInfos[$packageName] = $parameters;
-        $this->readAutoconfigAccess($parameters, $extra);
     }
 
     function getPackageParameters($packageName) {
@@ -354,31 +290,5 @@ class JelixParameters {
             $allModules = array_merge($allModules, $parameters->getSingleModuleDirs());
         }
         return $allModules;
-    }
-
-    function isJelix16()
-    {
-        if ($this->jelixTarget == '') {
-            if ($this->getPackageParameters('jelix/jelix') ||
-                $this->getPackageParameters('jelix/jelix-essential') ||
-                $this->getPackageParameters('jelix/for-classic-package')  // deprecated
-            ) {
-                return false;
-            }
-
-            if (file_exists($this->appDir.'app/system/mainconfig.ini.php')) {
-                $this->jelixTarget = '1.7';
-                return false;
-            }
-
-            if (file_exists($this->varConfigDir . 'mainconfig.ini.php')) {
-                $this->jelixTarget = '1.6';
-                return true;
-            }
-        }
-        else if ($this->jelixTarget == '1.6') {
-            return true;
-        }
-        return false;
     }
 }

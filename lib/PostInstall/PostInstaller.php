@@ -46,15 +46,16 @@ class PostInstaller
         $jelixParameters = new JelixParameters($this->vendorDir);
         $jelixParameters->loadFromFile();
 
+        // let's add all packages
         foreach($packages as $packageInfo) {
-            $action = $packageInfo[0];
+            list($action, $packageName, $extra, $packagePath) = $packageInfo;
+
             if ($action == 'removed') {
-                $jelixParameters->removePackage($packageInfo[1], $packageInfo[2]);
+                $jelixParameters->removePackage($packageName, $extra);
             }
             else {
                 try {
-                    list($action, $name, $extra, $path) = $packageInfo;
-                    $jelixParameters->addPackage($name, $extra, $path);
+                    $jelixParameters->addPackage($packageName, $extra, $packagePath);
                 } catch (ReaderException $e) {
                     $this->writeError($e->getMessage());
                 }
@@ -70,12 +71,9 @@ class PostInstaller
 
         $jelixParameters->saveToFile();
 
-        if ($jelixParameters->isJelix16()) {
-            $setup = new SetupJelix16($jelixParameters, $this->debugLogger);
-            $setup->setup();
-        } else {
-            $setup = new SetupJelix17($jelixParameters, $this->debugLogger);
-            $setup->setup();
-        }
+        // launch the setup of the application
+        $setup = new SetupJelix17($jelixParameters, $this->debugLogger);
+        $setup->setup();
+
     }
 }
