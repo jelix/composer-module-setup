@@ -183,7 +183,7 @@ relative to the composer.json directory, or can be absolute.
 ```json
 {
     "require": {
-        "jelix/composer-module-setup": "^1.0.0"
+        "jelix/composer-module-setup": "^1.1.0"
     },
     "extra": {
         "jelix": {
